@@ -1,13 +1,30 @@
+import asyncio
+import os
+from contextlib import asynccontextmanager
+
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
-from app.config import settings
 from app.api.v1.router import api_router  # 稍后我们会创建这个路由文件
+from app.config import settings
+from app.core.rag import build_knowledge_base
 
-# --- 1. 初始化 FastAPI 应用实例 ---
+
+# --- 应用启动时 同步 构建知识库 ---
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    if not os.path.exists(settings.VECTOR_STORE_PATH) or not os.listdir(settings.VECTOR_STORE_PATH):
+        print("构建本地知识库...")
+        await asyncio.to_thread(build_knowledge_base)
+    yield
+    # Shutdown (如果有需要清理的资源，如数据库连接池等)
+    print("应用关闭")
+
+# --- 初始化 FastAPI 应用实例 ---
 app = FastAPI(
     title=settings.PROJECT_NAME,
     description="""
@@ -21,10 +38,11 @@ app = FastAPI(
     version=settings.VERSION,
     docs_url="/docs",  # 访问 http://127.0.0.1:8000/docs 查看文档
     redoc_url="/redoc",
-    openapi_url=f"{settings.API_V1_STR}/openapi.json"
+    openapi_url=f"{settings.API_V1_STR}/openapi.json",
+    lifespan=lifespan
 )
 
-# --- 2. 配置 CORS (跨域资源共享) ---
+# ---  配置 CORS (跨域资源共享) ---
 # 允许前端（如 localhost:3000）调用后端接口
 app.add_middleware(
     CORSMiddleware,
@@ -34,13 +52,13 @@ app.add_middleware(
     allow_headers=["*"],  # 允许所有 HTTP 头
 )
 
-# --- 3. 挂载静态文件目录 ---
+# ---  挂载静态文件目录 ---
 # 用于让前端直接访问生成的 PPT/Word 文件（预览或下载用）
 # 访问路径示例: http://127.0.0.1:8000/static/exports/test.pptx
 app.mount("/static", StaticFiles(directory=settings.EXPORT_DIR), name="static")
 
 
-# --- 4. 注册全局异常处理器 ---
+# ---  注册全局异常处理器 ---
 # 统一的错误返回格式，方便前端处理
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
@@ -56,12 +74,12 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 
 
-# --- 5. 注册业务路由 ---
+# ---  注册业务路由 ---
 # 将 v1 版本的所有接口挂载到 API_V1_STR 前缀下
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
 
-# --- 6. 根路径健康检查 ---
+# ---  根路径健康检查 ---
 @app.get("/", tags=["Root"])
 async def root():
     """
@@ -74,7 +92,7 @@ async def root():
     }
 
 
-# --- 7. 启动入口 ---
+# --- 启动入口 ---
 # 只有当直接运行此文件时才启动服务器
 if __name__ == "__main__":
     print(f"🚀 正在启动服务: http://{settings.HOST}:{settings.PORT}")

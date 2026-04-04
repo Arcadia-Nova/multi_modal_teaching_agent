@@ -1,3 +1,7 @@
+langchain-text-splitters
+langchain-core
+langchain-community
+langchain
 pydantic-settings
 # ========== Web 框架 ==========
 fastapi==0.104.1
@@ -11,7 +15,7 @@ dashscope==1.14.1
 # openai==1.3.0
 
 # ========== 语音识别（Whisper） ==========
-#openai-whisper==20231117
+openai-whisper==20231117
 # 如需使用 OpenAI API 版本的 Whisper，可添加：
 # openai==1.3.0
 

@@ -31,6 +31,9 @@ class Settings(BaseSettings):
     VECTOR_DB_TYPE: str = "chroma"  # 可选: chroma, milvus, faiss
     VECTOR_DB_PATH: str = "./vector_store"  # 本地持久化路径
     EMBEDDING_MODEL: str = "BAAI/bge-large-zh-v1.5"  # 中文效果最好的开源 Embedding
+    CHUNK_SIZE: int = 512
+    CHUNK_OVERLAP: int = 64
+    TOP_K_RETRIEVAL: int = 5
 
     # --- 本地知识库路径 ---
     KNOWLEDGE_BASE_DIR: str = "./knowledge_base"
