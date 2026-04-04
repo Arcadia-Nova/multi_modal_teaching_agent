@@ -17,7 +17,7 @@ from app.core.rag import build_knowledge_base
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
-    if not os.path.exists(settings.VECTOR_STORE_PATH) or not os.listdir(settings.VECTOR_STORE_PATH):
+    if not os.path.exists(settings.VECTOR_DB_PATH) or not os.listdir(settings.VECTOR_DB_PATH):
         print("构建本地知识库...")
         await asyncio.to_thread(build_knowledge_base)
     yield

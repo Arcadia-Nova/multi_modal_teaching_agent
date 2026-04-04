@@ -2,7 +2,9 @@ langchain-text-splitters
 langchain-core
 langchain-community
 langchain
+
 pydantic-settings
+
 # ========== Web 框架 ==========
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
@@ -25,6 +27,7 @@ chromadb==0.4.22
 # ========== 文本嵌入模型 ==========
 # text2vec 和 BAAI/bge-large-zh 均基于 sentence-transformers
 sentence-transformers==2.2.2
+huggingface_hub==0.25.2
 # 如需单独安装 text2vec（可选，sentence-transformers 已包含相似功能）
 # text2vec==1.0.6
 
@@ -38,7 +41,7 @@ transformers==4.41.2
 pillow==12.1.1
 
 # ========== 文字识别（PaddleOCR） ==========
-paddleocr==2.7.3
+paddleocr==3.4.0
 # PaddlePaddle 需根据 CUDA 版本选择，CPU 版本如下：
 paddlepaddle==2.6.2
 # 如有 GPU（CUDA 11.7），请改为：
