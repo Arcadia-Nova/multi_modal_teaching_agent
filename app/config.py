@@ -27,6 +27,13 @@ class Settings(BaseSettings):
     LLM_BASE_URL: Optional[str] = None  # 如果部署在本地 vLLM，填 http://localhost:8000/v1
     LLM_MODEL_NAME: str = "qwen-turbo"  # 默认模型
 
+    #--- 语音识别配置 ---
+    DASHSCOPE_API_KEY: str = "sk-2ea33be7c2604c3c8fc17aedfb7d8145"
+
+    #--- 视频处理 ---
+    VIDEO_FRAME_INTERVAL_SEC: int = 3   # 抽帧间隔（秒）
+    MAX_VIDEO_FRAMES: int = 50          # 最多抽取多少帧，避免过多
+
     # --- 向量数据库配置 (RAG) ---
     VECTOR_DB_TYPE: str = "chroma"  # 可选: chroma, milvus, faiss
     VECTOR_DB_PATH: str = "./vector_store"  # 本地持久化路径
