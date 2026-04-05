@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from app.api.v1.router import api_router  # 稍后我们会创建这个路由文件
 from app.config import settings
 from app.core.rag import build_knowledge_base
-
+from app.db.session import init_db
 
 # --- 应用启动时 同步 构建知识库 ---
 @asynccontextmanager
@@ -20,6 +20,9 @@ async def lifespan(app: FastAPI):
     if not os.path.exists(settings.VECTOR_DB_PATH) or not os.listdir(settings.VECTOR_DB_PATH):
         print("构建本地知识库...")
         await asyncio.to_thread(build_knowledge_base)
+
+    init_db()
+
     yield
     # Shutdown (如果有需要清理的资源，如数据库连接池等)
     print("应用关闭")

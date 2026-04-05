@@ -45,7 +45,8 @@ class Settings(BaseSettings):
     ALLOWED_EXTENSIONS: List[str] = [".pdf", ".docx", ".pptx", ".txt", ".mp4", ".jpg", ".png"]
 
     # --- 数据库配置 (可选，用于保存历史记录) ---
-    DATABASE_URL: str = "sqlite:///./teaching_agent.db"  # 默认使用 SQLite
+    # DATABASE_URL: str = "sqlite:///./teaching_agent.db"  # 默认使用 SQLite
+    DATABASE_PATH: str = "./teaching_agent.db"
 
     # --- 安全配置 ---
     SECRET_KEY: str = "your-secret-key-change-this-in-production"
