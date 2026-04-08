@@ -1,3 +1,4 @@
+torch
 sqlalchemy
 langchain-text-splitters
 langchain-core
