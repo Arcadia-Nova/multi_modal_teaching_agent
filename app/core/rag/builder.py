@@ -27,8 +27,10 @@ def build_knowledge_base(collection_name: str = "teaching_knowledge_base"):
         return
 
     all_chunks = []
+    print(len(os.listdir(docs_dir)))
     for file_name in os.listdir(docs_dir):
         file_path = os.path.join(docs_dir, file_name)
+        print(file_path,file_name)
         if file_name.endswith(".pdf"):
             loader = PyPDFLoader(file_path)
         elif file_name.endswith(".docx"):

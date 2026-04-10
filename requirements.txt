@@ -1,9 +1,12 @@
+pydantic
 torch
 sqlalchemy
+
 langchain-text-splitters
 langchain-core
 langchain-community
 langchain
+pypdf
 
 pydantic-settings
 
