@@ -31,7 +31,7 @@ chromadb==0.4.22
 
 # ========== 文本嵌入模型 ==========
 # text2vec 和 BAAI/bge-large-zh 均基于 sentence-transformers
-sentence-transformers==2.2.2
+sentence-transformers==5.4.0
 huggingface_hub==0.25.2
 # 如需单独安装 text2vec（可选，sentence-transformers 已包含相似功能）
 # text2vec==1.0.6
@@ -48,7 +48,7 @@ pillow==12.1.1
 # ========== 文字识别（PaddleOCR） ==========
 paddleocr==3.4.0
 # PaddlePaddle 需根据 CUDA 版本选择，CPU 版本如下：
-paddlepaddle==2.6.2
+paddlepaddle==3.3.1
 # 如有 GPU（CUDA 11.7），请改为：
 # paddlepaddle-gpu==2.6.1
 
@@ -72,8 +72,8 @@ loguru==0.7.2
 # 文件类型检测
 python-magic==0.4.27
 # 异步 HTTP 客户端（调用外部 API 时使用）
-httpx==0.25.1
+httpx==0.28.1
 # 数据处理
-numpy==1.24.3
+numpy==1.26.4
 # 图像处理（补充）
 opencv-python-headless==4.8.1.78  # 可选，无 GUI 版本

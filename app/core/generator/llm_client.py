@@ -1,4 +1,3 @@
-from app.config import settings
 import dashscope
 
 # app/core/generator/llm_client.py
@@ -182,10 +181,12 @@ class LLMClient:
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
+            "Accept": "text/event-stream",
         }
         params = {
             "temperature": temperature,
             "result_format": "message",
+            "stream": True, #流式调用
             "incremental_output": True,  # 流式输出
             **kwargs
         }
@@ -200,7 +201,7 @@ class LLMClient:
             async with client.stream("POST", url, headers=headers, json=payload) as response:
                 if response.status_code != 200:
                     error_text = await response.aread()
-                    raise Exception(f"流式请求失败: {response.status_code} - {error_text}")
+                    raise Exception(f"流式请求失败: {response.status_code} - {error_text.decode()}")
                 async for line in response.aiter_lines():
                     if line.startswith("data:"):
                         data_str = line[5:].strip()
@@ -212,6 +213,7 @@ class LLMClient:
                             yield delta
                         except Exception as e:
                             logger.error(f"解析流式数据失败: {e}")
+                            print(f"{e}")
 
     def chat_with_json(
             self,
@@ -362,3 +364,4 @@ if __name__ == "__main__":
     test_topic = "人工智能简介"
     outline = client.generate_ppt_outline(test_topic)
     print("PPT大纲生成结果:", outline)
+

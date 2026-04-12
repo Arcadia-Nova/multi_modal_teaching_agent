@@ -1,12 +1,16 @@
 # app/services/dialogue_service.py
-from typing import Dict, List
+from typing import Dict, List, Optional, Any
+
+from sqlalchemy.orm import Session
+
 from app.core.intent.extractor import IntentExtractor
 from app.core.intent.clarifier import Clarifier
-from app.models.intent import TeachingIntent
+from app.models.conversation import Message, TeachingIntent
 
 
 class DialogueService:
-    def __init__(self, llm_client):
+    def __init__(self,db: Session ,llm_client):
+        self.db = db
         self.extractor = IntentExtractor(llm_client)
         self.clarifier = Clarifier()
         # 会话存储：session_id -> {history, current_intent}
@@ -49,3 +53,51 @@ class DialogueService:
         if session and session["intent"].is_complete:
             return session["intent"]
         raise ValueError("意图未完整，无法生成课件")
+
+    def _save_intent(self, session_id: str, intent: 'TeachingIntent'):
+        """保存或更新教学意图（每次提取都存新记录）"""
+        record = TeachingIntent(
+            session_id=session_id,
+            subject=intent.subject,
+            topic=intent.topic,
+            key_points=intent.key_points,
+            difficult_points=intent.difficult_points,
+            duration_minutes=intent.duration_minutes,
+            teaching_style=intent.teaching_style,
+            target_audience=intent.target_audience,
+            special_requirements=intent.special_requirements,
+            is_complete=intent.is_complete,
+            raw_intent_json=intent.dict()
+        )
+        self.db.add(record)
+        self.db.commit()
+
+
+    def get_intent_status(self, session_id: str) -> Optional[Dict[str, Any]]:
+        """获取当前会话的最新教学意图（结构化）"""
+        intent_record = self.db.query(TeachingIntent).filter(
+            TeachingIntent.session_id == session_id
+        ).order_by(TeachingIntent.id.desc()).first()
+        if not intent_record:
+            return None
+        # 转换为字典，排除内部字段
+        return {
+            "subject": intent_record.subject,
+            "topic": intent_record.topic,
+            "key_points": intent_record.key_points,
+            "difficult_points": intent_record.difficult_points,
+            "duration_minutes": intent_record.duration_minutes,
+            "teaching_style": intent_record.teaching_style,
+            "target_audience": intent_record.target_audience,
+            "special_requirements": intent_record.special_requirements,
+            "is_complete": intent_record.is_complete
+        }
+
+
+    def get_history(self, session_id: str, limit: int = 50) -> List[Dict[str, str]]:
+        """获取会话的对话历史，返回格式 [{"role": "user/assistant", "content": "..."}]"""
+        messages = self.db.query(Message).filter(
+            Message.session_id == session_id
+        ).order_by(Message.created_at).limit(limit).all()
+        return [{"role": msg.role, "content": msg.content} for msg in messages]
+

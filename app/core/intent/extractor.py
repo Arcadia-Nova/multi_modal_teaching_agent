@@ -1,6 +1,8 @@
 # app/core/intent/extractor.py
 import json
 from typing import Dict, List, Optional
+
+from app.core.generator import llm_client
 from app.core.generator.llm_client import LLMClient  # 假设已封装
 from app.models.intent import TeachingIntent
 
@@ -37,10 +39,13 @@ class IntentExtractor:
 """
         user_prompt = f"对话历史：\n{self._format_history(conversation_history)}\n请提取教学意图："
 
+        # self.llm = LLMClient()
+
         response = self.llm.chat([
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
         ], temperature=0.2)
+
 
         # 解析 JSON
         try:
