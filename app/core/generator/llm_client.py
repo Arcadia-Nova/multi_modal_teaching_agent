@@ -1,5 +1,3 @@
-<<<<<<< Updated upstream
-=======
 import dashscope
 
 # app/core/generator/llm_client.py
@@ -366,4 +364,4 @@ if __name__ == "__main__":
     test_topic = "人工智能简介"
     outline = client.generate_ppt_outline(test_topic)
     print("PPT大纲生成结果:", outline)
->>>>>>> Stashed changes
+

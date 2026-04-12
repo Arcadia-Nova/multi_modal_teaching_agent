@@ -1,12 +1,3 @@
-<<<<<<< Updated upstream
-=======
-# from fastapi import APIRouter
-#
-# router = APIRouter()
-#
-# @router.get("/test")
-# async def test_upload():
-#     return {"message": "Upload endpoint is active"}
 import os
 
 from fastapi import APIRouter, Depends, File, UploadFile, Form, HTTPException, BackgroundTasks
@@ -80,4 +71,4 @@ def get_parsed_result(
         summary=result.get("summary"),
         details=result.get("details")
     )
->>>>>>> Stashed changes
+

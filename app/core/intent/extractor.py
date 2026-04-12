@@ -1,5 +1,3 @@
-<<<<<<< Updated upstream
-=======
 # app/core/intent/extractor.py
 import json
 from typing import Dict, List, Optional
@@ -81,4 +79,3 @@ class IntentExtractor:
             missing.append("duration_minutes")
         # 可根据需要增加
         return missing
->>>>>>> Stashed changes

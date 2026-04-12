@@ -1,5 +1,3 @@
-<<<<<<< Updated upstream
-=======
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
@@ -67,4 +65,4 @@ def get_history(
     """获取会话的对话历史"""
     messages = dialogue_svc.get_history(session_id)
     return [MessageResponse(role=m.role, content=m.content, timestamp=m.created_at) for m in messages]
->>>>>>> Stashed changes
+

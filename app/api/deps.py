@@ -1,5 +1,3 @@
-<<<<<<< Updated upstream
-=======
 from fastapi import Request, Header, HTTPException, Depends
 from sqlalchemy.orm import Session
 from typing import Optional
@@ -24,4 +22,4 @@ def get_session_id(
 # 数据库会话依赖
 def get_db_session() -> Session:
     return next(get_db())
->>>>>>> Stashed changes
+

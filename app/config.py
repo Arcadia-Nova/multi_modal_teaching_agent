@@ -43,7 +43,11 @@ class Settings(BaseSettings):
     TOP_K_RETRIEVAL: int = 5
 
     # --- 本地知识库路径 ---
-    KNOWLEDGE_BASE_DIR: str = "./knowledge_base"
+    KNOWLEDGE_BASE_DIR: str = "./knowledge_base/documents"
+    EMBEDDING_MODEL_NAME: str = "BAAI/bge-large-zh-v1.5"
+
+    #--- 向量库路径 ---
+    VECTOR_STORE_PATH: str = "./vector_store"
 
     # --- 文件存储配置 ---
     UPLOAD_DIR: str = "./uploads"
