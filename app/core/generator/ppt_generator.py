@@ -2,11 +2,12 @@ from pptx import Presentation
 from pptx.util import Inches
 import os
 from app.config import settings
+from app.core.generator.llm_client import get_llm_client
 
 class PPTGenerator:
     def __init__(self):
         """初始化PPT生成器"""
-        pass
+        self.llm_client = get_llm_client()
     
     def generate_ppt(self, topic: str, content: list, output_filename: str = None):
         """
@@ -93,6 +94,154 @@ class PPTGenerator:
             })
         
         return self.generate_ppt(topic, content, output_filename)
+    
+    def generate_ppt_with_ai(self, topic: str, output_filename: str = None):
+        """
+        使用AI生成完整PPT
+        
+        Args:
+            topic: PPT主题
+            output_filename: 输出文件名
+            
+        Returns:
+            str: 生成的PPT文件路径
+        """
+        # 使用AI生成PPT大纲
+        outline = self._generate_ppt_outline_with_ai(topic)
+        # 从大纲生成PPT
+        return self.generate_ppt_from_outline(outline, output_filename)
+    
+    def enhance_ppt_content_with_ai(self, topic: str, content: list, output_filename: str = None):
+        """
+        使用AI增强PPT内容
+        
+        Args:
+            topic: PPT主题
+            content: PPT内容列表
+            output_filename: 输出文件名
+            
+        Returns:
+            str: 生成的PPT文件路径
+        """
+        # 使用AI增强每个幻灯片的内容
+        enhanced_content = []
+        for slide in content:
+            slide_title = slide.get('title', '无标题')
+            slide_content = slide.get('content', [])
+            
+            # 使用AI增强内容
+            enhanced_slide_content = self._enhance_slide_content_with_ai(topic, slide_title, slide_content)
+            
+            enhanced_content.append({
+                'title': slide_title,
+                'content': enhanced_slide_content
+            })
+        
+        # 生成PPT
+        return self.generate_ppt(topic, enhanced_content, output_filename)
+    
+    def _generate_ppt_outline_with_ai(self, topic: str):
+        """
+        使用AI生成PPT大纲
+        
+        Args:
+            topic: PPT主题
+            
+        Returns:
+            dict: PPT大纲
+        """
+        prompt = f"请为'{topic}'主题生成一个完整的PPT大纲，包含以下结构：\n"
+        prompt += "{\n"
+        prompt += "  \"topic\": \"主题名称\",\n"
+        prompt += "  \"sections\": [\n"
+        prompt += "    {\n"
+        prompt += "      \"title\": \"章节标题\",\n"
+        prompt += "      \"content\": [\"要点1\", \"要点2\", \"要点3\"]\n"
+        prompt += "    \n"
+        prompt += "  ]\n"
+        prompt += "}\n"
+        prompt += "请确保大纲结构完整，内容合理，至少包含3个章节，每个章节至少包含3个要点。"
+        
+        try:
+            response = self.llm_client.generate(prompt)
+            # 尝试解析响应为JSON
+            import json
+            try:
+                # 去除可能的markdown代码块标记
+                if response.startswith("```json"):
+                    response = response[7:]
+                if response.endswith("```"):
+                    response = response[:-3]
+                outline = json.loads(response.strip())
+                return outline
+            except json.JSONDecodeError:
+                # 如果解析失败，返回默认大纲
+                print("解析AI生成的大纲失败，使用默认大纲")
+                return {
+                    'topic': topic,
+                    'sections': [
+                        {
+                            'title': f'{topic}概述',
+                            'content': [f'{topic}的定义', f'{topic}的重要性', f'{topic}的应用场景']
+                        },
+                        {
+                            'title': f'{topic}的核心内容',
+                            'content': ['核心概念', '关键技术', '实现方法']
+                        },
+                        {
+                            'title': f'{topic}的未来发展',
+                            'content': ['发展趋势', '挑战与机遇', '总结与展望']
+                        }
+                    ]
+                }
+        except Exception as e:
+            print(f"生成PPT大纲失败: {str(e)}")
+            # 失败时返回默认大纲
+            return {
+                'topic': topic,
+                'sections': [
+                    {
+                        'title': f'{topic}概述',
+                        'content': [f'{topic}的定义', f'{topic}的重要性', f'{topic}的应用场景']
+                    },
+                    {
+                        'title': f'{topic}的核心内容',
+                        'content': ['核心概念', '关键技术', '实现方法']
+                    },
+                    {
+                        'title': f'{topic}的未来发展',
+                        'content': ['发展趋势', '挑战与机遇', '总结与展望']
+                    }
+                ]
+            }
+    
+    def _enhance_slide_content_with_ai(self, topic: str, slide_title: str, slide_content: list):
+        """
+        使用AI增强幻灯片内容
+        
+        Args:
+            topic: PPT主题
+            slide_title: 幻灯片标题
+            slide_content: 幻灯片内容
+            
+        Returns:
+            list: 增强后的内容
+        """
+        prompt = f"请增强'{topic}'主题下'{slide_title}'幻灯片的内容。\n"
+        prompt += f"当前内容：{', '.join(slide_content)}\n"
+        prompt += "请生成更详细、更有深度的内容，保持要点式结构，每个要点简洁明了。\n"
+        prompt += "请以列表形式输出，每个要点一行。"
+        
+        try:
+            response = self.llm_client.generate(prompt)
+            # 解析响应，提取增强后的内容
+            enhanced_content = [line.strip() for line in response.split('\n') if line.strip()]
+            # 确保内容不为空
+            return enhanced_content if enhanced_content else slide_content
+        except Exception as e:
+            print(f"增强幻灯片内容失败: {str(e)}")
+            # 失败时返回原始内容
+            return slide_content
 
 # 测试代码
 if __name__ == "__main__":
