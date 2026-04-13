@@ -24,7 +24,7 @@ async def upload_file(
 ):
     """上传参考资料，支持PDF/Word/PPT/图片/视频"""
     # 校验文件类型
-    allowed_extensions = ['.pdf', '.docx', '.pptx', '.jpg', '.jpeg', '.png', '.mp4']
+    allowed_extensions = ['.pdf', '.docx', '.pptx', '.jpg', '.jpeg', '.png', '.mp4' , '.mp3']
     ext = os.path.splitext(file.filename)[1].lower()
     if ext not in allowed_extensions:
         raise HTTPException(status_code=415, detail=f"不支持的文件类型: {ext}")
@@ -34,7 +34,7 @@ async def upload_file(
         session_id=session_id,
         file=file,
         reference_note=reference_note,
-        background_tasks=background_tasks
+        # background_tasks=background_tasks
     )
     return FileUploadResponse(
         file_id=file_id,

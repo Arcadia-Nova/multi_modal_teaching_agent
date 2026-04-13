@@ -1,4 +1,7 @@
+import json
+
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -35,8 +38,33 @@ def start_session(
     session_id = session_svc.create_session(user_name=req.user_name)
     return SessionResponse(session_id=session_id, message="会话已创建")
 
+@router.post("/chat", response_model=MessageResponse)
+async def chat(
+    req: ChatRequest,
+    session_id: str = Depends(deps.get_session_id),
+    dialogue_svc: DialogueService = Depends(get_dialogue_service),
+    db: Session = Depends(deps.get_db_session)
+):
+    """
+       纯粹的对话流式接口
+       """
 
-@router.post("/message", response_model=ChatResponse)
+    # 定义一个异步生成器来处理 SSE 格式
+    async def stream_generator():
+        # chat_service.chat_stream 是一个异步生成器
+        async for chunk in dialogue_svc.chat_stream(session_id, req.text):
+            # 格式化为 SSE 格式
+            # 注意：这里假设 chunk 是字符串
+            yield f"data: {json.dumps({'content': chunk}, ensure_ascii=False)}\n\n"
+
+        # 发送结束信号
+        yield f"data: {json.dumps({'content': '', 'done': True}, ensure_ascii=False)}\n\n"
+
+    # 返回流式响应
+    # 直接传入异步生成器
+    return StreamingResponse(stream_generator(), media_type="text/plain")
+
+@router.post("/intent_message", response_model=ChatResponse)
 def send_message(
     req: ChatRequest,
     session_id: str = Depends(deps.get_session_id),
