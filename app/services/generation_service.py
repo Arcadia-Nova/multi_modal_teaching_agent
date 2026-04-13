@@ -1,6 +1,7 @@
 from app.core.generator.ppt_generator import PPTGenerator
 from app.core.generator.word_generator import WordGenerator
 from app.core.generator.animation_generator import AnimationGenerator
+from app.core.generator.game_generator import GameGenerator
 from app.core.generator.llm_client import LLMClient
 import json
 
@@ -10,6 +11,7 @@ class GenerationService:
         self.ppt_generator = PPTGenerator()
         self.word_generator = WordGenerator()
         self.animation_generator = AnimationGenerator()
+        self.game_generator = GameGenerator()
         self.llm_client = LLMClient()
     
     def generate_ppt(self, topic: str, content: list = None, outline: dict = None, output_filename: str = None):
@@ -118,11 +120,20 @@ class GenerationService:
             dict: 包含生成结果的字典
         """
         try:
-            # 这里可以添加Word生成逻辑
+            # 调用Word生成器
+            output_path = self.word_generator.generate_word(topic, content, output_filename)
+            
+            # 生成可访问的URL
+            relative_path = output_path.replace('app\\static\\', '')
+            access_url = f"/static/{relative_path}"
+            
             return {
                 "success": True,
-                "message": "Word生成功能开发中",
-                "data": None
+                "message": "Word生成成功",
+                "data": {
+                    "file_path": output_path,
+                    "access_url": access_url
+                }
             }
         except Exception as e:
             return {
@@ -157,13 +168,258 @@ class GenerationService:
                 "data": None
             }
     
+    def generate_game(self, topic: str, content: list = None, game_type: str = "quiz", output_filename: str = None):
+        """
+        生成游戏
+        
+        Args:
+            topic: 游戏主题
+            content: 游戏内容
+            game_type: 游戏类型 (quiz, memory, matching)
+            output_filename: 输出文件名
+            
+        Returns:
+            dict: 包含生成结果的字典
+        """
+        try:
+            # 调用游戏生成器
+            output_path = self.game_generator.generate_game(topic, content, game_type, output_filename)
+            
+            # 生成可访问的URL
+            relative_path = output_path.replace('app\\static\\', '')
+            access_url = f"/static/{relative_path}"
+            
+            return {
+                "success": True,
+                "message": "游戏生成成功",
+                "data": {
+                    "file_path": output_path,
+                    "access_url": access_url
+                }
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "message": f"游戏生成失败: {str(e)}",
+                "data": None
+            }
+    
+    def generate_ppt_with_ai(self, topic: str, output_filename: str = None):
+        """
+        使用AI生成PPT
+        
+        Args:
+            topic: PPT主题
+            output_filename: 输出文件名
+            
+        Returns:
+            dict: 包含生成结果的字典
+        """
+        try:
+            # 调用AI增强的PPT生成器
+            output_path = self.ppt_generator.generate_ppt_with_ai(topic, output_filename)
+            
+            # 生成可访问的URL
+            relative_path = output_path.replace('app\\static\\', '')
+            access_url = f"/static/{relative_path}"
+            
+            return {
+                "success": True,
+                "message": "AI生成PPT成功",
+                "data": {
+                    "file_path": output_path,
+                    "access_url": access_url
+                }
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "message": f"AI生成PPT失败: {str(e)}",
+                "data": None
+            }
+    
+    def enhance_ppt_with_ai(self, topic: str, content: list, output_filename: str = None):
+        """
+        使用AI增强PPT内容
+        
+        Args:
+            topic: PPT主题
+            content: PPT内容
+            output_filename: 输出文件名
+            
+        Returns:
+            dict: 包含生成结果的字典
+        """
+        try:
+            # 调用AI增强的PPT生成器
+            output_path = self.ppt_generator.enhance_ppt_content_with_ai(topic, content, output_filename)
+            
+            # 生成可访问的URL
+            relative_path = output_path.replace('app\\static\\', '')
+            access_url = f"/static/{relative_path}"
+            
+            return {
+                "success": True,
+                "message": "AI增强PPT成功",
+                "data": {
+                    "file_path": output_path,
+                    "access_url": access_url
+                }
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "message": f"AI增强PPT失败: {str(e)}",
+                "data": None
+            }
+    
+    def generate_lesson_plan_with_ai(self, topic: str, output_filename: str = None):
+        """
+        使用AI生成教案
+        
+        Args:
+            topic: 教案主题
+            output_filename: 输出文件名
+            
+        Returns:
+            dict: 包含生成结果的字典
+        """
+        try:
+            # 调用AI增强的Word生成器
+            output_path = self.word_generator.generate_lesson_plan_with_ai(topic, output_filename)
+            
+            # 生成可访问的URL
+            relative_path = output_path.replace('app\\static\\', '')
+            access_url = f"/static/{relative_path}"
+            
+            return {
+                "success": True,
+                "message": "AI生成教案成功",
+                "data": {
+                    "file_path": output_path,
+                    "access_url": access_url
+                }
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "message": f"AI生成教案失败: {str(e)}",
+                "data": None
+            }
+    
+    def generate_lesson_plan_from_ppt_with_ai(self, topic: str, ppt_content: list, output_filename: str = None):
+        """
+        从PPT内容生成AI增强教案
+        
+        Args:
+            topic: 教案主题
+            ppt_content: PPT内容
+            output_filename: 输出文件名
+            
+        Returns:
+            dict: 包含生成结果的字典
+        """
+        try:
+            # 调用AI增强的Word生成器
+            output_path = self.word_generator.generate_lesson_plan_from_ppt(topic, ppt_content, output_filename)
+            
+            # 生成可访问的URL
+            relative_path = output_path.replace('app\\static\\', '')
+            access_url = f"/static/{relative_path}"
+            
+            return {
+                "success": True,
+                "message": "AI生成教案成功",
+                "data": {
+                    "file_path": output_path,
+                    "access_url": access_url
+                }
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "message": f"AI生成教案失败: {str(e)}",
+                "data": None
+            }
+    
+    def generate_game_with_ai(self, topic: str, game_type: str = "quiz", output_filename: str = None):
+        """
+        使用AI生成游戏
+        
+        Args:
+            topic: 游戏主题
+            game_type: 游戏类型 (quiz, memory, matching)
+            output_filename: 输出文件名
+            
+        Returns:
+            dict: 包含生成结果的字典
+        """
+        try:
+            # 调用AI增强的游戏生成器
+            output_path = self.game_generator.generate_game_with_ai(topic, game_type, output_filename)
+            
+            # 生成可访问的URL
+            relative_path = output_path.replace('app\\static\\', '')
+            access_url = f"/static/{relative_path}"
+            
+            return {
+                "success": True,
+                "message": "AI生成游戏成功",
+                "data": {
+                    "file_path": output_path,
+                    "access_url": access_url
+                }
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "message": f"AI生成游戏失败: {str(e)}",
+                "data": None
+            }
+    
+    def enhance_game_with_ai(self, topic: str, content: list, game_type: str = "quiz", output_filename: str = None):
+        """
+        使用AI增强游戏内容
+        
+        Args:
+            topic: 游戏主题
+            content: 游戏内容
+            game_type: 游戏类型
+            output_filename: 输出文件名
+            
+        Returns:
+            dict: 包含生成结果的字典
+        """
+        try:
+            # 调用AI增强的游戏生成器
+            output_path = self.game_generator.enhance_game_content_with_ai(topic, content, game_type, output_filename)
+            
+            # 生成可访问的URL
+            relative_path = output_path.replace('app\\static\\', '')
+            access_url = f"/static/{relative_path}"
+            
+            return {
+                "success": True,
+                "message": "AI增强游戏成功",
+                "data": {
+                    "file_path": output_path,
+                    "access_url": access_url
+                }
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "message": f"AI增强游戏失败: {str(e)}",
+                "data": None
+            }
+    
     def generate_courseware(self, topic: str, type: str, content: list = None, outline: dict = None, output_filename: str = None):
         """
         生成课件
         
         Args:
             topic: 课件主题
-            type: 课件类型 (ppt, word, animation)
+            type: 课件类型 (ppt, word, animation, game)
             content: 课件内容
             outline: 课件大纲
             output_filename: 输出文件名
@@ -177,6 +433,8 @@ class GenerationService:
             return self.generate_word(topic, content, output_filename)
         elif type == "animation":
             return self.generate_animation(topic, content, output_filename)
+        elif type == "game":
+            return self.generate_game(topic, content, "quiz", output_filename)
         else:
             return {
                 "success": False,
