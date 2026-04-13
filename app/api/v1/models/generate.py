@@ -16,6 +16,11 @@ class PPTOutline(BaseModel):
     topic: str = Field(..., description="PPT主题")
     sections: List[PPTOutlineSection] = Field(..., description="PPT章节列表")
 
+class GameContentItem(BaseModel):
+    """游戏内容项"""
+    title: str = Field(..., description="游戏题目")
+    content: List[str] = Field(..., description="游戏选项或内容")
+
 class GeneratePPTRequest(BaseModel):
     """生成PPT请求"""
     topic: str = Field(..., description="PPT主题")
@@ -23,12 +28,54 @@ class GeneratePPTRequest(BaseModel):
     outline: Optional[PPTOutline] = Field(None, description="PPT大纲")
     output_filename: Optional[str] = Field(None, description="输出文件名")
 
+class GenerateGameRequest(BaseModel):
+    """生成游戏请求"""
+    topic: str = Field(..., description="游戏主题")
+    content: Optional[List[GameContentItem]] = Field(None, description="游戏内容")
+    game_type: str = Field("quiz", description="游戏类型 (quiz, memory, matching)")
+    output_filename: Optional[str] = Field(None, description="输出文件名")
+
 class GenerateCoursewareRequest(BaseModel):
     """生成课件请求"""
     topic: str = Field(..., description="课件主题")
-    type: str = Field(..., description="课件类型 (ppt, word, animation)")
+    type: str = Field(..., description="课件类型 (ppt, word, animation, game)")
     content: Optional[List[PPTContentItem]] = Field(None, description="课件内容")
     outline: Optional[PPTOutline] = Field(None, description="课件大纲")
+    output_filename: Optional[str] = Field(None, description="输出文件名")
+
+class GeneratePPTWithAIRequest(BaseModel):
+    """使用AI生成PPT请求"""
+    topic: str = Field(..., description="PPT主题")
+    output_filename: Optional[str] = Field(None, description="输出文件名")
+
+class EnhancePPTWithAIRequest(BaseModel):
+    """使用AI增强PPT内容请求"""
+    topic: str = Field(..., description="PPT主题")
+    content: List[PPTContentItem] = Field(..., description="PPT内容")
+    output_filename: Optional[str] = Field(None, description="输出文件名")
+
+class GenerateLessonPlanWithAIRequest(BaseModel):
+    """使用AI生成教案请求"""
+    topic: str = Field(..., description="教案主题")
+    output_filename: Optional[str] = Field(None, description="输出文件名")
+
+class GenerateLessonPlanFromPPTWithAIRequest(BaseModel):
+    """从PPT内容生成AI增强教案请求"""
+    topic: str = Field(..., description="教案主题")
+    ppt_content: List[PPTContentItem] = Field(..., description="PPT内容")
+    output_filename: Optional[str] = Field(None, description="输出文件名")
+
+class GenerateGameWithAIRequest(BaseModel):
+    """使用AI生成游戏请求"""
+    topic: str = Field(..., description="游戏主题")
+    game_type: str = Field("quiz", description="游戏类型 (quiz, memory, matching)")
+    output_filename: Optional[str] = Field(None, description="输出文件名")
+
+class EnhanceGameWithAIRequest(BaseModel):
+    """使用AI增强游戏内容请求"""
+    topic: str = Field(..., description="游戏主题")
+    content: List[GameContentItem] = Field(..., description="游戏内容")
+    game_type: str = Field("quiz", description="游戏类型")
     output_filename: Optional[str] = Field(None, description="输出文件名")
 
 class GenerateResponse(BaseModel):
