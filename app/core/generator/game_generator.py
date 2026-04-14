@@ -53,7 +53,7 @@ class GameGenerator:
                 question = {
                     'question': item['title'],
                     'options': item['content'][:4],  # 最多4个选项
-                    'correct': 0  # 默认第一个为正确答案
+                    'correct': item.get('correct', 0)  # 使用AI生成的正确答案索引，如果没有则默认为0
                 }
                 questions.append(question)
         
@@ -495,12 +495,13 @@ def _generate_game_content_with_ai(self, topic: str, game_type: str):
         list: 游戏内容
     """
     if game_type == "quiz":
-        prompt = f"请为'{topic}'主题生成5个问答游戏题目，每个题目包含一个问题和4个选项（其中一个是正确答案）。\n"
+        prompt = f"请为'{topic}'主题生成5个问答游戏题目，每个题目包含一个问题、4个选项和1个正确答案的索引（从0开始）。\n"
         prompt += "请以以下格式输出：\n"
         prompt += "[\n"
         prompt += "  {\n"
         prompt += "    \"title\": \"问题内容\",\n"
-        prompt += "    \"content\": [\"选项1\", \"选项2\", \"选项3\", \"选项4\"]\n"
+        prompt += "    \"content\": [\"选项1\", \"选项2\", \"选项3\", \"选项4\"],\n"
+        prompt += "    \"correct\": 正确答案的索引（0-3）\n"
         prompt += "  },\n"
         prompt += "  ...\n"
         prompt += "]\n"
@@ -522,17 +523,18 @@ def _generate_game_content_with_ai(self, topic: str, game_type: str):
         prompt += "请确保概念与相关内容之间有明确的对应关系。"
     else:
         # 默认生成问答游戏内容
-        prompt = f"请为'{topic}'主题生成5个问答游戏题目，每个题目包含一个问题和4个选项（其中一个是正确答案）。\n"
+        prompt = f"请为'{topic}'主题生成5个问答游戏题目，每个题目包含一个问题、4个选项和1个正确答案的索引（从0开始）。\n"
         prompt += "请以以下格式输出：\n"
         prompt += "[\n"
         prompt += "  {\n"
         prompt += "    \"title\": \"问题内容\",\n"
-        prompt += "    \"content\": [\"选项1\", \"选项2\", \"选项3\", \"选项4\"]\n"
+        prompt += "    \"content\": [\"选项1\", \"选项2\", \"选项3\", \"选项4\"],\n"
+        prompt += "    \"correct\": 正确答案的索引（0-3）\n"
         prompt += "  },\n"
         prompt += "  ...\n"
         prompt += "]\n"
         prompt += "请确保问题具有教育意义，选项合理，且正确答案明确。"
-    
+
     try:
         response = self.llm_client.generate(prompt)
         # 尝试解析响应

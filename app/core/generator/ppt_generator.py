@@ -3,13 +3,11 @@ from pptx.util import Inches
 import os
 from app.config import settings
 from app.core.generator.llm_client import get_llm_client
-from app.core.generator.ppt_template_manager import template_manager
 
 class PPTGenerator:
     def __init__(self):
         """初始化PPT生成器"""
         self.llm_client = get_llm_client()
-        self.template_manager = template_manager
     
     def generate_ppt(self, topic: str, content: list, output_filename: str = None, template_id: str = None):
         """
@@ -35,9 +33,9 @@ class PPTGenerator:
             if isinstance(item, dict) and 'title' in item and 'content' in item:
                 self._add_content_slide(prs, item['title'], item['content'])
         
-        # 应用模板
+        # 应用模板（暂时不支持模板ID，使用外部模板文件）
         if template_id:
-            prs = self.template_manager.apply_template(prs, template_id)
+            print(f"模板ID: {template_id}（暂时不支持）")
         
         # 生成文件名
         if not output_filename:
@@ -382,7 +380,8 @@ class PPTGenerator:
         Returns:
             list: 模板列表
         """
-        return self.template_manager.get_available_templates()
+        # 暂时返回空列表
+        return []
     
     def get_template_preview(self, template_id: str = None):
         """
@@ -394,7 +393,8 @@ class PPTGenerator:
         Returns:
             dict: 模板预览信息
         """
-        return self.template_manager.get_template_preview(template_id)
+        # 暂时返回空字典
+        return {}
     
 
     
