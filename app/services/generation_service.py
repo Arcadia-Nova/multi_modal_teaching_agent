@@ -441,6 +441,206 @@ class GenerationService:
                 "message": "不支持的课件类型",
                 "data": None
             }
+    
+    def get_available_templates(self):
+        """
+        获取所有可用模板
+        
+        Returns:
+            list: 模板列表
+        """
+        try:
+            return self.ppt_generator.get_available_templates()
+        except Exception as e:
+            return []
+    
+    def get_template_preview(self, template_id: str = None):
+        """
+        获取模板预览
+        
+        Args:
+            template_id: 模板ID
+            
+        Returns:
+            dict: 模板预览信息
+        """
+        try:
+            return self.ppt_generator.get_template_preview(template_id)
+        except Exception as e:
+            return None
+    
+    def generate_ppt_with_template(self, topic: str, content: list = None, template_id: str = None, output_filename: str = None):
+        """
+        使用模板生成PPT
+        
+        Args:
+            topic: PPT主题
+            content: PPT内容列表
+            template_id: 模板ID
+            output_filename: 输出文件名
+            
+        Returns:
+            dict: 包含生成结果的字典
+        """
+        try:
+            # 如果没有提供内容，使用LLM生成
+            if not content:
+                outline = self._generate_ppt_outline(topic)
+                content = []
+                for section in outline.get('sections', []):
+                    content.append({
+                        'title': section.get('title', '无标题'),
+                        'content': section.get('content', [])
+                    })
+            
+            # 调用PPT生成器，使用模板
+            output_path = self.ppt_generator.generate_ppt(topic, content, output_filename, template_id)
+            
+            # 生成可访问的URL
+            relative_path = output_path.replace('app\\static\\', '')
+            access_url = f"/static/{relative_path}"
+            
+            return {
+                "success": True,
+                "message": "使用模板生成PPT成功",
+                "data": {
+                    "file_path": output_path,
+                    "access_url": access_url,
+                    "template_id": template_id
+                }
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "message": f"使用模板生成PPT失败: {str(e)}",
+                "data": None
+            }
+    
+    def generate_ppt_from_template(self, template_path: str, topic: str, content: list = None, output_filename: str = None):
+        """
+        从外部模板文件生成PPT
+        
+        Args:
+            template_path: 模板文件路径
+            topic: PPT主题
+            content: PPT内容列表
+            output_filename: 输出文件名
+            
+        Returns:
+            dict: 包含生成结果的字典
+        """
+        try:
+            # 调用PPT生成器，从外部模板文件生成
+            output_path = self.ppt_generator.generate_ppt_from_template(template_path, topic, content, output_filename)
+            
+            # 生成可访问的URL
+            relative_path = output_path.replace('app\\static\\', '')
+            access_url = f"/static/{relative_path}"
+            
+            return {
+                "success": True,
+                "message": "从模板文件生成PPT成功",
+                "data": {
+                    "file_path": output_path,
+                    "access_url": access_url,
+                    "template_path": template_path
+                }
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "message": f"从模板文件生成PPT失败: {str(e)}",
+                "data": None
+            }
+    
+    def generate_ppt_with_ai_from_template(self, template_path: str, topic: str, content_requirement: str = None, output_filename: str = None):
+        """
+        使用AI生成内容并从模板文件生成PPT
+        严格沿用模板的版式、字体、配色、排版样式和母版格式
+        
+        Args:
+            template_path: 模板文件路径
+            topic: PPT主题
+            content_requirement: 用户的内容需求
+            output_filename: 输出文件名
+            
+        Returns:
+            dict: 包含生成结果的字典
+        """
+        try:
+            # 调用PPT生成器，使用AI生成内容并从模板文件生成
+            output_path = self.ppt_generator.generate_ppt_with_ai_from_template(
+                template_path=template_path,
+                topic=topic,
+                content_requirement=content_requirement,
+                output_filename=output_filename
+            )
+            
+            # 生成可访问的URL
+            relative_path = output_path.replace('app\\static\\', '')
+            access_url = f"/static/{relative_path}"
+            
+            return {
+                "success": True,
+                "message": "AI生成内容并从模板文件生成PPT成功",
+                "data": {
+                    "file_path": output_path,
+                    "access_url": access_url,
+                    "template_path": template_path,
+                    "content_requirement": content_requirement
+                }
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "message": f"AI生成PPT失败: {str(e)}",
+                "data": None
+            }
+    
+    def generate_enhanced_ppt_with_ai_from_template(self, template_path: str, topic: str, content_requirement: str = None, output_filename: str = None):
+        """
+        使用AI生成并增强内容，从模板文件生成PPT
+        严格沿用模板的版式、字体、配色、排版样式和母版格式
+        只生成一个包含AI增强内容的PPT文件
+        
+        Args:
+            template_path: 模板文件路径
+            topic: PPT主题
+            content_requirement: 用户的内容需求
+            output_filename: 输出文件名
+            
+        Returns:
+            dict: 包含生成结果的字典
+        """
+        try:
+            # 调用PPT生成器，使用AI生成并增强内容，从模板文件生成
+            output_path = self.ppt_generator.generate_enhanced_ppt_with_ai_from_template(
+                template_path=template_path,
+                topic=topic,
+                content_requirement=content_requirement,
+                output_filename=output_filename
+            )
+            
+            # 生成可访问的URL
+            relative_path = output_path.replace('app\\static\\', '')
+            access_url = f"/static/{relative_path}"
+            
+            return {
+                "success": True,
+                "message": "AI生成并增强内容，从模板文件生成PPT成功",
+                "data": {
+                    "file_path": output_path,
+                    "access_url": access_url,
+                    "template_path": template_path,
+                    "content_requirement": content_requirement
+                }
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "message": f"AI生成增强版PPT失败: {str(e)}",
+                "data": None
+            }
 
 # 测试代码
 if __name__ == "__main__":
@@ -464,3 +664,11 @@ if __name__ == "__main__":
     ]
     result2 = service.generate_ppt(test_topic, content=test_content)
     print("带内容的PPT生成结果:", result2)
+    
+    # 测试获取模板列表
+    templates = service.get_available_templates()
+    print("可用模板:", templates)
+    
+    # 测试使用模板生成PPT
+    result3 = service.generate_ppt_with_template(test_topic, content=test_content, template_id="education")
+    print("使用模板生成PPT结果:", result3)

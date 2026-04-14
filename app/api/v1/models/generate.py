@@ -78,6 +78,46 @@ class EnhanceGameWithAIRequest(BaseModel):
     game_type: str = Field("quiz", description="游戏类型")
     output_filename: Optional[str] = Field(None, description="输出文件名")
 
+class GeneratePPTWithTemplateRequest(BaseModel):
+    """使用模板生成PPT请求"""
+    topic: str = Field(..., description="PPT主题")
+    content: Optional[List[PPTContentItem]] = Field(None, description="PPT内容")
+    template_id: Optional[str] = Field(None, description="模板ID")
+    output_filename: Optional[str] = Field(None, description="输出文件名")
+
+class GeneratePPTFromTemplateRequest(BaseModel):
+    """从外部模板文件生成PPT请求"""
+    template_path: str = Field(..., description="模板文件路径")
+    topic: str = Field(..., description="PPT主题")
+    content: Optional[List[PPTContentItem]] = Field(None, description="PPT内容")
+    output_filename: Optional[str] = Field(None, description="输出文件名")
+
+class GeneratePPTWithAIFromTemplateRequest(BaseModel):
+    """使用AI生成内容并从模板文件生成PPT请求"""
+    template_path: str = Field(..., description="模板文件路径")
+    topic: str = Field(..., description="PPT主题")
+    content_requirement: Optional[str] = Field(None, description="用户的内容需求")
+    output_filename: Optional[str] = Field(None, description="输出文件名")
+
+class GenerateEnhancedPPTWithAIFromTemplateRequest(BaseModel):
+    """使用AI生成并增强内容，从模板文件生成PPT请求"""
+    template_path: str = Field(..., description="模板文件路径")
+    topic: str = Field(..., description="PPT主题")
+    content_requirement: Optional[str] = Field(None, description="用户的内容需求")
+    output_filename: Optional[str] = Field(None, description="输出文件名")
+
+class GetTemplatesResponse(BaseModel):
+    """获取模板列表响应"""
+    success: bool = Field(..., description="是否成功")
+    message: str = Field(..., description="消息")
+    data: Optional[List[Dict[str, str]]] = Field(None, description="模板列表")
+
+class GetTemplatePreviewResponse(BaseModel):
+    """获取模板预览响应"""
+    success: bool = Field(..., description="是否成功")
+    message: str = Field(..., description="消息")
+    data: Optional[Dict[str, Any]] = Field(None, description="模板预览信息")
+
 class GenerateResponse(BaseModel):
     """生成响应"""
     success: bool = Field(..., description="是否成功")

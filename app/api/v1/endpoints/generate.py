@@ -9,7 +9,13 @@ from app.api.v1.models.generate import (
     GenerateLessonPlanWithAIRequest,
     GenerateLessonPlanFromPPTWithAIRequest,
     GenerateGameWithAIRequest,
-    EnhanceGameWithAIRequest
+    EnhanceGameWithAIRequest,
+    GeneratePPTWithTemplateRequest,
+    GeneratePPTFromTemplateRequest,
+    GeneratePPTWithAIFromTemplateRequest,
+    GenerateEnhancedPPTWithAIFromTemplateRequest,
+    GetTemplatesResponse,
+    GetTemplatePreviewResponse
 )
 from app.services.generation_service import GenerationService
 
@@ -244,3 +250,146 @@ async def enhance_game_with_ai(request: EnhanceGameWithAIRequest):
         return GenerateResponse(**result)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"AI增强游戏失败: {str(e)}")
+
+@router.get("/templates", response_model=GetTemplatesResponse, summary="获取所有可用模板")
+async def get_templates():
+    """
+    获取所有可用模板
+    
+    返回所有内置模板的列表
+    """
+    try:
+        # 调用生成服务获取模板列表
+        templates = generation_service.get_available_templates()
+        
+        return GetTemplatesResponse(
+            success=True,
+            message="获取模板列表成功",
+            data=templates
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"获取模板列表失败: {str(e)}")
+
+@router.get("/templates/{template_id}/preview", response_model=GetTemplatePreviewResponse, summary="获取模板预览")
+async def get_template_preview(template_id: str):
+    """
+    获取模板预览
+    
+    - **template_id**: 模板ID
+    """
+    try:
+        # 调用生成服务获取模板预览
+        preview = generation_service.get_template_preview(template_id)
+        
+        return GetTemplatePreviewResponse(
+            success=True,
+            message="获取模板预览成功",
+            data=preview
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"获取模板预览失败: {str(e)}")
+
+@router.post("/ppt/with-template", response_model=GenerateResponse, summary="使用模板生成PPT")
+async def generate_ppt_with_template(request: GeneratePPTWithTemplateRequest):
+    """
+    使用模板生成PPT
+    
+    - **topic**: PPT主题
+    - **content**: PPT内容（可选）
+    - **template_id**: 模板ID（可选）
+    - **output_filename**: 输出文件名（可选）
+    """
+    try:
+        # 转换请求数据为服务所需格式
+        content = None
+        if request.content:
+            content = [item.model_dump() for item in request.content]
+        
+        # 调用生成服务
+        result = generation_service.generate_ppt_with_template(
+            topic=request.topic,
+            content=content,
+            template_id=request.template_id,
+            output_filename=request.output_filename
+        )
+        
+        return GenerateResponse(**result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"使用模板生成PPT失败: {str(e)}")
+
+@router.post("/ppt/from-template", response_model=GenerateResponse, summary="从外部模板文件生成PPT")
+async def generate_ppt_from_template(request: GeneratePPTFromTemplateRequest):
+    """
+    从外部模板文件生成PPT
+    
+    - **template_path**: 模板文件路径
+    - **topic**: PPT主题
+    - **content**: PPT内容（可选）
+    - **output_filename**: 输出文件名（可选）
+    """
+    try:
+        # 转换请求数据为服务所需格式
+        content = None
+        if request.content:
+            content = [item.model_dump() for item in request.content]
+        
+        # 调用生成服务
+        result = generation_service.generate_ppt_from_template(
+            template_path=request.template_path,
+            topic=request.topic,
+            content=content,
+            output_filename=request.output_filename
+        )
+        
+        return GenerateResponse(**result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"从模板文件生成PPT失败: {str(e)}")
+
+@router.post("/ppt/ai/from-template", response_model=GenerateResponse, summary="使用AI生成内容并从模板文件生成PPT")
+async def generate_ppt_with_ai_from_template(request: GeneratePPTWithAIFromTemplateRequest):
+    """
+    使用AI生成内容并从模板文件生成PPT
+    严格沿用模板的版式、字体、配色、排版样式和母版格式
+    
+    - **template_path**: 模板文件路径
+    - **topic**: PPT主题
+    - **content_requirement**: 用户的内容需求（可选）
+    - **output_filename**: 输出文件名（可选）
+    """
+    try:
+        # 调用生成服务
+        result = generation_service.generate_ppt_with_ai_from_template(
+            template_path=request.template_path,
+            topic=request.topic,
+            content_requirement=request.content_requirement,
+            output_filename=request.output_filename
+        )
+        
+        return GenerateResponse(**result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"AI生成PPT失败: {str(e)}")
+
+@router.post("/ppt/ai/enhanced/from-template", response_model=GenerateResponse, summary="使用AI生成并增强内容，从模板文件生成PPT")
+async def generate_enhanced_ppt_with_ai_from_template(request: GenerateEnhancedPPTWithAIFromTemplateRequest):
+    """
+    使用AI生成并增强内容，从模板文件生成PPT
+    严格沿用模板的版式、字体、配色、排版样式和母版格式
+    只生成一个包含AI增强内容的PPT文件
+    
+    - **template_path**: 模板文件路径
+    - **topic**: PPT主题
+    - **content_requirement**: 用户的内容需求（可选）
+    - **output_filename**: 输出文件名（可选）
+    """
+    try:
+        # 调用生成服务
+        result = generation_service.generate_enhanced_ppt_with_ai_from_template(
+            template_path=request.template_path,
+            topic=request.topic,
+            content_requirement=request.content_requirement,
+            output_filename=request.output_filename
+        )
+        
+        return GenerateResponse(**result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"AI生成增强版PPT失败: {str(e)}")
