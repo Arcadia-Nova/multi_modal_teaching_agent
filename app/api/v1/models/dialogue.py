@@ -9,6 +9,9 @@ class SessionResponse(BaseModel):
     session_id: str
     message: str
 
+class AllSessionResponse(BaseModel):
+    session_id: str
+
 class ChatRequest(BaseModel):
     text: str
 

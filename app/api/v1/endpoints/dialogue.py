@@ -11,7 +11,7 @@ from app.api import deps
 from app.core.generator.llm_client import LLMClient
 from app.api.v1.models.dialogue import (
     ChatRequest, ChatResponse, SessionCreateRequest, SessionResponse,
-    MessageResponse
+    MessageResponse, AllSessionResponse
 )
 
 router = APIRouter()
@@ -93,4 +93,11 @@ def get_history(
     """获取会话的对话历史"""
     messages = dialogue_svc.get_history(session_id)
     return [MessageResponse(role=m.role, content=m.content, timestamp=m.created_at) for m in messages]
+
+@router.get("/session_history", response_model=List[AllSessionResponse])
+def get_session_history(
+    session_svc: SessionService = Depends(get_session_service)
+):
+    session_history = session_svc.get_all_session()
+    return [AllSessionResponse(session_id=s.session_id) for s in session_history]
 

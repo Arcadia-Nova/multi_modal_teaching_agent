@@ -33,3 +33,6 @@ class SessionService:
         if session:
             session.last_active = datetime.now()
             self.db.commit()
+
+    def get_all_session(self):
+        return self.db.query(ConversationSession).all()
