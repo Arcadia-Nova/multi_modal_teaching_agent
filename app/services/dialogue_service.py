@@ -115,7 +115,8 @@ class DialogueService:
         messages = self.db.query(Message).filter(
             Message.session_id == session_id
         ).order_by(Message.created_at).limit(limit).all()
-        return [{"role": msg.role, "content": msg.content} for msg in messages]
+        # return [{"role": msg.role, "content": msg.content} for msg in messages]
+        return messages
 
     async def chat_stream(self, session_id: str, user_message: str) -> AsyncGenerator[str, None]:
         """
