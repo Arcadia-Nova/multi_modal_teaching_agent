@@ -656,23 +656,28 @@ def _get_default_game_content(self, topic: str, game_type: str):
         return [
             {
                 'title': f'{topic}的基本概念是什么?',
-                'content': ['选项1', '选项2', '选项3', '选项4']
+                'content': ['选项1', '选项2', '选项3', '选项4'],
+                'correct': 0
             },
             {
                 'title': f'{topic}的重要性体现在哪些方面?',
-                'content': ['选项1', '选项2', '选项3', '选项4']
+                'content': ['选项1', '选项2', '选项3', '选项4'],
+                'correct': 0
             },
             {
                 'title': f'{topic}的应用场景有哪些?',
-                'content': ['选项1', '选项2', '选项3', '选项4']
+                'content': ['选项1', '选项2', '选项3', '选项4'],
+                'correct': 0
             },
             {
                 'title': f'{topic}的发展历史是怎样的?',
-                'content': ['选项1', '选项2', '选项3', '选项4']
+                'content': ['选项1', '选项2', '选项3', '选项4'],
+                'correct': 0
             },
             {
                 'title': f'{topic}的未来趋势是什么?',
-                'content': ['选项1', '选项2', '选项3', '选项4']
+                'content': ['选项1', '选项2', '选项3', '选项4'],
+                'correct': 0
             }
         ]
     elif game_type == "memory":
