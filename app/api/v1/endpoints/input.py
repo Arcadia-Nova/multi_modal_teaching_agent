@@ -34,13 +34,14 @@ async def text_input(
 
 @router.post("/upload")
 async def upload_reference(
+    background_tasks: BackgroundTasks,
     session_id: str = Depends(deps.get_session_id),
     file: UploadFile = File(...),
     reference_note: str = Form(None),
     db: Session = Depends(get_db)
 ):
     service = InputService(db)
-    file_id = await service.upload_reference(session_id, file, reference_note)
+    file_id = await service.upload_reference(background_tasks,session_id, file, reference_note)
     return {"file_id": file_id, "message": "上传成功，正在后台解析"}
 
 

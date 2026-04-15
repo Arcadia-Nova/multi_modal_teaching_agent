@@ -34,7 +34,7 @@ async def upload_file(
         session_id=session_id,
         file=file,
         reference_note=reference_note,
-        # background_tasks=background_tasks
+        background_tasks=background_tasks
     )
     return FileUploadResponse(
         file_id=file_id,

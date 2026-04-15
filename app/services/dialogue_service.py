@@ -126,9 +126,11 @@ class DialogueService:
         self.message_service.save_message(session_id, "user", user_message)
 
         # 2. 获取历史记录并构建 Messages
+
         history_messages = self.message_service.get_history(session_id)
+        ref_msg = self.message_service.get_references(session_id)
         if history_messages:
-            messages = history_messages
+            messages = history_messages+ref_msg
 
         # 3. 初始化缓存
         self.stream_cache[session_id] = ""
@@ -153,3 +155,10 @@ class DialogueService:
             # 清理缓存
             self.stream_cache.pop(session_id, None)
 
+    def get_first_message(self, session_id: str):
+
+        messages = self.db.query(Message).filter(
+            Message.session_id == session_id
+        ).first()
+
+        return messages.content

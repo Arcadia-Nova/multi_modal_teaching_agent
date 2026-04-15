@@ -8,6 +8,7 @@ from typing import List, Dict
 
 # 假设你的 Message 模型定义在 models/conversation.py 中
 from app.models.conversation import Message
+from app.models.reference import ParsedReference,UploadedFile
 
 
 class MessageService:
@@ -69,3 +70,37 @@ class MessageService:
         """
         self.db.query(Message).filter(Message.session_id == session_id).delete()
         self.db.commit()
+
+    def get_references(self,session_id: str, limit: int = 5) -> List[Dict[str, str]]:
+        query = self.db.query(UploadedFile).filter(
+            UploadedFile.session_id == session_id
+        ).order_by(UploadedFile.created_at.desc())
+
+        if limit:
+            query = query.limit(limit)
+
+        reference = query.all()
+        ref_list = []
+        count = 0
+
+        for ref in reference:
+            count += 1
+            file_id = ref.file_id
+            query_ref = self.db.query(ParsedReference).filter(
+                ParsedReference.file_id == file_id
+            ).order_by(ParsedReference.created_at.desc())
+
+            reference2 = query_ref.first()
+            if reference2:
+               ref_list = ref_list + [reference2.content]
+
+
+
+
+        role = str("user")
+        des = str("这是用户上传的文档的分析,请进行解析:")
+
+        return [
+            { "role": role ,"content": des+ref_list[i]}
+            for i in range(len(ref_list))
+        ]

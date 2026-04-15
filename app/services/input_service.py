@@ -2,10 +2,12 @@ import os
 from datetime import datetime
 from typing import Optional, Dict, Any
 
+from fastapi import BackgroundTasks
 from sqlalchemy.orm import Session
 
 from app.core.multimodal.image_parser import parse_image
 from app.core.multimodal.text_parser import parse_document
+from app.core.multimodal.video_parser import VideoParser
 from app.core.multimodal.voice_transcriber import VoiceTranscriber
 from app.models.reference import UploadedFile, FileType, ParsedReference
 from app.models.conversation import Message
@@ -17,6 +19,7 @@ class InputService:
     def __init__(self, db: Session):
         self.db = db
         self.transcriber = VoiceTranscriber()
+        self.video_parser = VideoParser()
 
     async def process_voice(self, session_id: str, audio_file) -> str:
         """处理语音：保存音频 -> 转文字 -> 保存消息 -> 返回文字"""
@@ -50,7 +53,7 @@ class InputService:
         self.db.commit()
         return text
 
-    async def upload_reference(self, session_id: str, file, reference_note: str = None) -> str:
+    async def upload_reference(self,background_tasks: BackgroundTasks, session_id: str, file, reference_note: str = None) -> str:
         """上传参考资料，保存记录，返回 file_id"""
         import uuid
         file_id = str(uuid.uuid4())
@@ -88,6 +91,12 @@ class InputService:
 
         # 触发异步解析（可使用 BackgroundTasks）
         # await trigger_parsing(file_id)
+        background_tasks.add_task(
+            self._parse_file_async,
+            file_id,
+            file_path,
+            file_type
+        )
 
         return file_id
 
@@ -144,7 +153,7 @@ class InputService:
         parsed = ParsedReference(
             file_id=file_id,
             content_type=content_type,
-            content=content[:2000],  # 限制长度
+            content=content[:5000],  # 限制长度
             metadata_json=metadata,
             is_summary=1 if content_type == "summary" else 0
         )

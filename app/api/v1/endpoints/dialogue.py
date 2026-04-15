@@ -96,8 +96,10 @@ def get_history(
 
 @router.get("/session_history", response_model=List[AllSessionResponse])
 def get_session_history(
-    session_svc: SessionService = Depends(get_session_service)
+    session_svc: SessionService = Depends(get_session_service),
+    dialogue_svc: DialogueService = Depends(get_dialogue_service)
 ):
+
     session_history = session_svc.get_all_session()
-    return [AllSessionResponse(session_id=s.session_id) for s in session_history]
+    return [AllSessionResponse(session_id=s.session_id,content=dialogue_svc.get_first_message(s.session_id)) for s in session_history]
 
