@@ -11,6 +11,7 @@ class SessionResponse(BaseModel):
 
 class AllSessionResponse(BaseModel):
     session_id: str
+    content: str
 
 class ChatRequest(BaseModel):
     text: str

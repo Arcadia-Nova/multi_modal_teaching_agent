@@ -1,4 +1,7 @@
 # app/core/multimodal/image_parser.py
+import os
+os.environ['FLAGS_use_mkldnn'] = '0'
+
 from paddleocr import PaddleOCR
 from PIL import Image
 from transformers import BlipProcessor, BlipForConditionalGeneration
@@ -15,13 +18,13 @@ blip_model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image
 
 def parse_image(image_path: str) -> dict:
     # 1. OCR文字识别
-    ocr_result = ocr.ocr(image_path, cls=True)
+    ocr_result = ocr.ocr(image_path)
     ocr_text = " ".join([line[1][0] for line in ocr_result[0]])
 
     # 2. BLIP图像描述
     image = Image.open(image_path).convert('RGB')
     inputs = blip_processor(image, return_tensors="pt").to(device)
-    out = blip_model.generate(**inputs)
+    out = blip_model.generate(**inputs,max_new_tokens=200)
     description = blip_processor.decode(out[0], skip_special_tokens=True)
 
     return {

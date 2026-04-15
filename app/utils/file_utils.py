@@ -15,4 +15,4 @@ async def save_upload_file(upload_file: UploadFile, destination_dir: str) -> str
     file_path = os.path.join(destination_dir, new_name)
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(upload_file.file, buffer)
-    return file_path
+    return str(Path(file_path).as_posix())
