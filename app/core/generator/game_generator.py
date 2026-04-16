@@ -52,12 +52,11 @@ class GameGenerator:
             if isinstance(item, dict) and 'title' in item and 'content' in item:
                 question = {
                     'question': item['title'],
-                    'options': item['content'][:4],  # 最多4个选项
-                    'correct': 0  # 默认第一个为正确答案
+                    'options': item['content'][:4],
+                    'correct': item.get('correct', 0)
                 }
                 questions.append(question)
-        
-        # 生成HTML
+
         html_parts = []
         html_parts.append('<!DOCTYPE html>')
         html_parts.append('<html lang="zh-CN">')
@@ -66,109 +65,112 @@ class GameGenerator:
         html_parts.append('<meta name="viewport" content="width=device-width, initial-scale=1.0">')
         html_parts.append(f'<title>{topic} - 问答游戏</title>')
         html_parts.append('<style>')
-        html_parts.append('body { font-family: Arial, sans-serif; background-color: #f0f0f0; margin: 0; padding: 20px; }')
-        html_parts.append('.container { max-width: 800px; margin: 0 auto; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }')
-        html_parts.append('h1 { text-align: center; color: #333; }')
-        html_parts.append('.question { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }')
-        html_parts.append('.question h3 { margin-top: 0; color: #555; }')
-        html_parts.append('.options { margin-top: 10px; }')
-        html_parts.append('.option { margin: 5px 0; padding: 10px; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; }')
-        html_parts.append('.option:hover { background-color: #e9e9e9; }')
-        html_parts.append('.option.correct { background-color: #d4edda; border-color: #c3e6cb; }')
-        html_parts.append('.option.incorrect { background-color: #f8d7da; border-color: #f5c6cb; }')
-        html_parts.append('.option.selected { background-color: #e3f2fd; border-color: #bbdefb; }')
-        html_parts.append('#result { margin-top: 20px; padding: 15px; background-color: #e3f2fd; border-radius: 5px; text-align: center; font-size: 18px; font-weight: bold; }')
-        html_parts.append('#submit-btn { display: block; width: 100%; padding: 10px; margin-top: 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; }')
-        html_parts.append('#submit-btn:hover { background-color: #45a049; }')
+        html_parts.append('* { box-sizing: border-box; margin: 0; padding: 0; }')
+        html_parts.append('body { font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); min-height: 100vh; padding: 20px; }')
+        html_parts.append('.container { max-width: 800px; margin: 0 auto; }')
+        html_parts.append('.header { text-align: center; color: white; margin-bottom: 30px; }')
+        html_parts.append('.header h1 { font-size: 2.5em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }')
+        html_parts.append('.progress-bar { background: rgba(255,255,255,0.3); height: 12px; border-radius: 6px; margin-bottom: 25px; overflow: hidden; }')
+        html_parts.append('.progress-fill { background: white; height: 100%; border-radius: 6px; transition: width 0.4s ease; }')
+        html_parts.append('.score-board { display: flex; justify-content: center; gap: 30px; margin-bottom: 25px; }')
+        html_parts.append('.score-item { background: rgba(255,255,255,0.2); padding: 10px 25px; border-radius: 50px; color: white; font-size: 1.1em; backdrop-filter: blur(5px); }')
+        html_parts.append('.question-card { background: white; border-radius: 16px; padding: 30px; margin-bottom: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }')
+        html_parts.append('.question-number { display: inline-block; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.9em; margin-bottom: 15px; }')
+        html_parts.append('.question-text { font-size: 1.4em; color: #333; margin-bottom: 25px; line-height: 1.6; }')
+        html_parts.append('.options { display: flex; flex-direction: column; gap: 12px; }')
+        html_parts.append('.option { padding: 18px 25px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border: 3px solid #dee2e6; border-radius: 12px; cursor: pointer; font-size: 1.1em; transition: all 0.3s ease; text-align: left; }')
+        html_parts.append('.option:hover:not(.disabled) { transform: translateX(5px); border-color: #11998e; background: linear-gradient(135deg, #e8f5f3 0%, #d4edda 100%); }')
+        html_parts.append('.option.selected { border-color: #11998e; background: linear-gradient(135deg, #d1f2eb 0%, #c3e6cb 100%); }')
+        html_parts.append('.option.correct { border-color: #28a745; background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); animation: pulse 0.5s ease; }')
+        html_parts.append('.option.incorrect { border-color: #dc3545; background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); animation: shake 0.5s ease; }')
+        html_parts.append('.option.disabled { cursor: default; opacity: 0.7; }')
+        html_parts.append('@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }')
+        html_parts.append('@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }')
+        html_parts.append('.nav-buttons { display: flex; gap: 15px; margin-top: 20px; }')
+        html_parts.append('.btn { padding: 15px 35px; font-size: 1.1em; border: none; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; }')
+        html_parts.append('.btn-primary { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; }')
+        html_parts.append('.btn-primary:hover { transform: translateY(-3px); box-shadow: 0 5px 20px rgba(17,153,142,0.4); }')
+        html_parts.append('.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }')
+        html_parts.append('.result-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; }')
+        html_parts.append('.result-modal.show { display: flex; }')
+        html_parts.append('.result-content { background: white; padding: 50px 70px; border-radius: 20px; text-align: center; animation: popIn 0.5s ease; }')
+        html_parts.append('@keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }')
+        html_parts.append('.result-content h2 { font-size: 2.5em; margin-bottom: 15px; }')
+        html_parts.append('.result-content .score { font-size: 3em; font-weight: bold; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 20px 0; }')
+        html_parts.append('.result-content p { font-size: 1.2em; color: #666; margin-bottom: 30px; }')
+        html_parts.append('.stars { font-size: 2em; margin-bottom: 20px; }')
         html_parts.append('</style>')
         html_parts.append('</head>')
         html_parts.append('<body>')
         html_parts.append('<div class="container">')
+        html_parts.append('<div class="header">')
         html_parts.append(f'<h1>{topic}</h1>')
-        html_parts.append('<div id="quiz">')
-        
-        for i, q in enumerate(questions):
-            html_parts.append(f'<div class="question">')
-            html_parts.append(f'<h3>问题 {i+1}: {q["question"]}</h3>')
-            html_parts.append('<div class="options">')
-            
-            for j, option in enumerate(q['options']):
-                html_parts.append(f'<div class="option" data-question="{i}" data-option="{j}">{option}</div>')
-            
-            html_parts.append('</div>')
-            html_parts.append('</div>')
-        
+        html_parts.append('<p style="font-size:1.2em;opacity:0.9;">测试你的知识！</p>')
         html_parts.append('</div>')
-        html_parts.append('<button id="submit-btn">提交答案</button>')
-        html_parts.append('<div id="result"></div>')
+        html_parts.append('<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>')
+        html_parts.append('<div class="score-board">')
+        html_parts.append('<div class="score-item">⏱️ <span id="timer">0</span>秒</div>')
+        html_parts.append('<div class="score-item">✅ <span id="current">1</span>/' + str(len(questions)) + '</div>')
+        html_parts.append('<div class="score-item">⭐ <span id="score">0</span>分</div>')
+        html_parts.append('</div>')
+        html_parts.append('<div class="question-card" id="question-card">')
+        html_parts.append('<div class="question-number" id="question-number">第 1 题</div>')
+        html_parts.append('<div class="question-text" id="question-text"></div>')
+        html_parts.append('<div class="options" id="options"></div>')
+        html_parts.append('<div class="nav-buttons">')
+        html_parts.append('<button class="btn btn-primary" id="prev-btn" disabled>← 上一题</button>')
+        html_parts.append('<button class="btn btn-primary" id="next-btn">下一题 →</button>')
+        html_parts.append('<button class="btn btn-primary" id="submit-btn" style="display:none;">提交答案</button>')
+        html_parts.append('</div>')
+        html_parts.append('</div>')
+        html_parts.append('</div>')
+        html_parts.append('<div class="result-modal" id="result-modal">')
+        html_parts.append('<div class="result-content">')
+        html_parts.append('<div class="stars" id="stars"></div>')
+        html_parts.append('<h2 id="result-title">游戏结束!</h2>')
+        html_parts.append('<div class="score" id="final-score"></div>')
+        html_parts.append('<p id="result-text"></p>')
+        html_parts.append('<button class="btn btn-primary" onclick="resetGame()">再玩一次</button>')
+        html_parts.append('</div>')
         html_parts.append('</div>')
         html_parts.append('<script>')
         html_parts.append(f'const questions = {json.dumps(questions)};')
-        html_parts.append('const options = document.querySelectorAll(".option");')
-        html_parts.append('const submitBtn = document.getElementById("submit-btn");')
-        html_parts.append('const resultDiv = document.getElementById("result");')
-        html_parts.append('let selectedAnswers = {};')
-        html_parts.append('options.forEach(option => {')
-        html_parts.append('option.addEventListener("click", function() {')
-        html_parts.append('const question = this.getAttribute("data-question");')
-        html_parts.append('const optionValue = this.getAttribute("data-option");')
-        html_parts.append('document.querySelectorAll(".option").forEach(opt => {')
-        html_parts.append('if (opt.getAttribute("data-question") === question) {')
-        html_parts.append('opt.classList.remove("selected");')
-        html_parts.append('}')
-        html_parts.append('});')
-        html_parts.append('this.classList.add("selected");')
-        html_parts.append('selectedAnswers[question] = optionValue;')
-        html_parts.append('});')
-        html_parts.append('});')
-        html_parts.append('submitBtn.addEventListener("click", function() {')
+        html_parts.append('let currentQuestion = 0;')
         html_parts.append('let score = 0;')
-        html_parts.append('questions.forEach((q, index) => {')
-        html_parts.append('const selected = selectedAnswers[index];')
-        html_parts.append('if (selected && parseInt(selected) === q.correct) {')
-        html_parts.append('score++;')
-        html_parts.append('document.querySelectorAll(".option").forEach(opt => {')
-        html_parts.append('if (opt.getAttribute("data-question") === index.toString() && opt.getAttribute("data-option") === q.correct.toString()) {')
-        html_parts.append('opt.classList.add("correct");')
-        html_parts.append('}')
-        html_parts.append('});')
-        html_parts.append('} else if (selected) {')
-        html_parts.append('document.querySelectorAll(".option").forEach(opt => {')
-        html_parts.append('if (opt.getAttribute("data-question") === index.toString() && opt.getAttribute("data-option") === selected.toString()) {')
-        html_parts.append('opt.classList.add("incorrect");')
-        html_parts.append('}')
-        html_parts.append('});')
-        html_parts.append('document.querySelectorAll(".option").forEach(opt => {')
-        html_parts.append('if (opt.getAttribute("data-question") === index.toString() && opt.getAttribute("data-option") === q.correct.toString()) {')
-        html_parts.append('opt.classList.add("correct");')
-        html_parts.append('}')
-        html_parts.append('});')
-        html_parts.append('}')
-        html_parts.append('});')
-        html_parts.append('resultDiv.textContent = "得分: " + score + "/" + questions.length;')
-        html_parts.append('submitBtn.disabled = true;')
-        html_parts.append('});')
+        html_parts.append('let startTime = Date.now();')
+        html_parts.append('let answered = [];')
+        html_parts.append('let timerInterval;')
+        html_parts.append('function updateTimer() { document.getElementById("timer").textContent = Math.floor((Date.now() - startTime) / 1000); }')
+        html_parts.append('function updateProgress() { document.getElementById("progress").style.width = ((currentQuestion + 1) / questions.length * 100) + "%"; }')
+        html_parts.append('function showQuestion() { const q = questions[currentQuestion]; document.getElementById("question-number").textContent = "第 " + (currentQuestion + 1) + " 题"; document.getElementById("question-text").textContent = q.question; document.getElementById("current").textContent = currentQuestion + 1; updateProgress(); const optionsDiv = document.getElementById("options"); optionsDiv.innerHTML = ""; q.options.forEach((opt, i) => { const btn = document.createElement("div"); btn.className = "option"; if (answered[currentQuestion] !== undefined) { btn.classList.add("disabled"); if (i === q.correct) btn.classList.add("correct"); if (i === answered[currentQuestion] && i !== q.correct) btn.classList.add("incorrect"); } btn.textContent = String.fromCharCode(65 + i) + ". " + opt; if (answered[currentQuestion] === undefined) btn.onclick = () => selectOption(i); optionsDiv.appendChild(btn); }); document.getElementById("prev-btn").disabled = currentQuestion === 0; const isLast = currentQuestion === questions.length - 1; document.getElementById("next-btn").style.display = isLast ? "none" : "inline-block"; document.getElementById("submit-btn").style.display = isLast && answered[currentQuestion] !== undefined ? "inline-block" : "none"; }')
+        html_parts.append('function selectOption(optIndex) { const q = questions[currentQuestion]; answered[currentQuestion] = optIndex; document.querySelectorAll(".option").forEach((opt, i) => { opt.classList.add("disabled"); if (i === q.correct) opt.classList.add("correct"); if (i === optIndex && i !== q.correct) opt.classList.add("incorrect"); }); if (optIndex === q.correct) { score++; document.getElementById("score").textContent = score; } const isLast = currentQuestion === questions.length - 1; document.getElementById("submit-btn").style.display = isLast ? "inline-block" : "none"; }')
+        html_parts.append('function nextQuestion() { if (currentQuestion < questions.length - 1) { currentQuestion++; showQuestion(); } }')
+        html_parts.append('function prevQuestion() { if (currentQuestion > 0) { currentQuestion--; showQuestion(); } }')
+        html_parts.append('function showResult() { clearInterval(timerInterval); const elapsed = Math.floor((Date.now() - startTime) / 1000); const pct = Math.round(score / questions.length * 100); let stars = ""; for (let i = 0; i < 3; i++) stars += pct >= (i + 1) * 30 ? "⭐" : "☆"; let title = pct >= 80 ? "🎉 太棒了!" : pct >= 60 ? "👍 不错!" : "💪 继续加油!"; document.getElementById("stars").textContent = stars; document.getElementById("result-title").textContent = title; document.getElementById("final-score").textContent = score + "/" + questions.length; document.getElementById("result-text").textContent = "用时" + elapsed + "秒，正确率" + pct + "%"; document.getElementById("result-modal").classList.add("show"); }')
+        html_parts.append('function resetGame() { currentQuestion = 0; score = 0; answered = []; startTime = Date.now(); document.getElementById("score").textContent = "0"; document.getElementById("result-modal").classList.remove("show"); showQuestion(); timerInterval = setInterval(updateTimer, 1000); }')
+        html_parts.append('document.getElementById("next-btn").onclick = nextQuestion;')
+        html_parts.append('document.getElementById("prev-btn").onclick = prevQuestion;')
+        html_parts.append('document.getElementById("submit-btn").onclick = showResult;')
+        html_parts.append('timerInterval = setInterval(updateTimer, 1000);')
+        html_parts.append('showQuestion();')
         html_parts.append('</script>')
         html_parts.append('</body>')
         html_parts.append('</html>')
-        
+
         return ''.join(html_parts)
     
     def _generate_memory_game(self, topic: str, content: list):
         """生成记忆游戏"""
-        # 提取内容作为记忆卡片
         cards = []
         for item in content:
             if isinstance(item, dict) and 'title' in item:
                 cards.append(item['title'])
             elif isinstance(item, str):
                 cards.append(item)
-        
-        # 确保卡片数量为偶数
+
         if len(cards) % 2 != 0 and len(cards) > 1:
             cards.append(cards[-1])
-        
-        # 生成HTML
+
         html_parts = []
         html_parts.append('<!DOCTYPE html>')
         html_parts.append('<html lang="zh-CN">')
@@ -177,96 +179,117 @@ class GameGenerator:
         html_parts.append('<meta name="viewport" content="width=device-width, initial-scale=1.0">')
         html_parts.append(f'<title>{topic} - 记忆游戏</title>')
         html_parts.append('<style>')
-        html_parts.append('body { font-family: Arial, sans-serif; background-color: #f0f0f0; margin: 0; padding: 20px; }')
-        html_parts.append('.container { max-width: 800px; margin: 0 auto; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }')
-        html_parts.append('h1 { text-align: center; color: #333; }')
-        html_parts.append('.game-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; }')
-        html_parts.append('.card { aspect-ratio: 1; background-color: #4CAF50; color: white; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s ease; }')
-        html_parts.append('.card.flipped { background-color: #2196F3; }')
-        html_parts.append('.card.matched { background-color: #ff9800; cursor: default; }')
-        html_parts.append('#score { text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 20px; }')
-        html_parts.append('#reset-btn { display: block; width: 100%; padding: 10px; margin-top: 20px; background-color: #f44336; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; }')
-        html_parts.append('#reset-btn:hover { background-color: #da190b; }')
+        html_parts.append('* { box-sizing: border-box; margin: 0; padding: 0; }')
+        html_parts.append('body { font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); min-height: 100vh; padding: 20px; }')
+        html_parts.append('.container { max-width: 700px; margin: 0 auto; }')
+        html_parts.append('.header { text-align: center; color: white; margin-bottom: 30px; }')
+        html_parts.append('.header h1 { font-size: 2.5em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }')
+        html_parts.append('.score-board { display: flex; justify-content: center; gap: 30px; margin-bottom: 25px; }')
+        html_parts.append('.score-item { background: rgba(255,255,255,0.2); padding: 12px 30px; border-radius: 50px; color: white; font-size: 1.2em; backdrop-filter: blur(5px); }')
+        html_parts.append('.game-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }')
+        html_parts.append('.card { aspect-ratio: 1; perspective: 1000px; cursor: pointer; }')
+        html_parts.append('.card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; }')
+        html_parts.append('.card.flipped .card-inner { transform: rotateY(180deg); }')
+        html_parts.append('.card.matched .card-inner { transform: rotateY(180deg); }')
+        html_parts.append('.card.matched { cursor: default; }')
+        html_parts.append('.card-front, .card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 0.9em; text-align: center; padding: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }')
+        html_parts.append('.card-front { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 2em; }')
+        html_parts.append('.card-back { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); color: #333; transform: rotateY(180deg); font-weight: bold; line-height: 1.4; }')
+        html_parts.append('.card.matched .card-front { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }')
+        html_parts.append('.card.matched .card-back { background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); }')
+        html_parts.append('.result-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; }')
+        html_parts.append('.result-modal.show { display: flex; }')
+        html_parts.append('.result-content { background: white; padding: 50px 70px; border-radius: 20px; text-align: center; animation: popIn 0.5s ease; }')
+        html_parts.append('@keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }')
+        html_parts.append('.result-content h2 { font-size: 2.5em; color: #11998e; margin-bottom: 15px; }')
+        html_parts.append('.result-content .score { font-size: 3em; font-weight: bold; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 20px 0; }')
+        html_parts.append('.result-content p { font-size: 1.2em; color: #666; margin-bottom: 30px; }')
+        html_parts.append('.btn { padding: 15px 40px; font-size: 1.2em; border: none; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }')
+        html_parts.append('.btn:hover { transform: translateY(-3px); box-shadow: 0 5px 20px rgba(245,87,108,0.4); }')
+        html_parts.append('.stars { font-size: 2em; margin-bottom: 15px; }')
         html_parts.append('</style>')
         html_parts.append('</head>')
         html_parts.append('<body>')
         html_parts.append('<div class="container">')
+        html_parts.append('<div class="header">')
         html_parts.append(f'<h1>{topic}</h1>')
-        html_parts.append('<div id="score">尝试次数: 0</div>')
+        html_parts.append('<p style="font-size:1.2em;opacity:0.9;">找出所有配对卡牌！</p>')
+        html_parts.append('</div>')
+        html_parts.append('<div class="score-board">')
+        html_parts.append('<div class="score-item">⏱️ <span id="timer">0</span>秒</div>')
+        html_parts.append('<div class="score-item">🎯 <span id="pairs">0</span>/' + str(len(cards)) + '对</div>')
+        html_parts.append('<div class="score-item">🔄 <span id="moves">0</span>次</div>')
+        html_parts.append('</div>')
         html_parts.append('<div class="game-board" id="game-board"></div>')
-        html_parts.append('<button id="reset-btn">重新开始</button>')
+        html_parts.append('</div>')
+        html_parts.append('<div class="result-modal" id="result-modal">')
+        html_parts.append('<div class="result-content">')
+        html_parts.append('<div class="stars" id="stars"></div>')
+        html_parts.append('<h2 id="result-title">🎉 恭喜通关!</h2>')
+        html_parts.append('<div class="score" id="final-score"></div>')
+        html_parts.append('<p id="result-text"></p>')
+        html_parts.append('<button class="btn" onclick="resetGame()">再玩一次</button>')
+        html_parts.append('</div>')
         html_parts.append('</div>')
         html_parts.append('<script>')
         html_parts.append(f'const cards = {json.dumps(cards)};')
         html_parts.append('let gameBoard = document.getElementById("game-board");')
-        html_parts.append('let scoreDisplay = document.getElementById("score");')
-        html_parts.append('let resetBtn = document.getElementById("reset-btn");')
         html_parts.append('let flippedCards = [];')
         html_parts.append('let matchedPairs = 0;')
-        html_parts.append('let attempts = 0;')
+        html_parts.append('let moves = 0;')
         html_parts.append('let gameActive = true;')
+        html_parts.append('let startTime = Date.now();')
+        html_parts.append('let timerInterval;')
+        html_parts.append('function updateTimer() { document.getElementById("timer").textContent = Math.floor((Date.now() - startTime) / 1000); }')
         html_parts.append('function initGame() {')
         html_parts.append('flippedCards = [];')
         html_parts.append('matchedPairs = 0;')
-        html_parts.append('attempts = 0;')
+        html_parts.append('moves = 0;')
         html_parts.append('gameActive = true;')
-        html_parts.append('scoreDisplay.textContent = "尝试次数: " + attempts;')
+        html_parts.append('startTime = Date.now();')
+        html_parts.append('document.getElementById("pairs").textContent = "0";')
+        html_parts.append('document.getElementById("moves").textContent = "0";')
         html_parts.append('gameBoard.innerHTML = "";')
         html_parts.append('let gameCards = [...cards, ...cards];')
         html_parts.append('gameCards.sort(() => Math.random() - 0.5);')
         html_parts.append('gameCards.forEach((card, index) => {')
-        html_parts.append('const cardElement = document.createElement("div");')
-        html_parts.append('cardElement.classList.add("card");')
-        html_parts.append('cardElement.dataset.index = index;')
-        html_parts.append('cardElement.dataset.value = card;')
-        html_parts.append('cardElement.textContent = "?";')
-        html_parts.append('cardElement.addEventListener("click", flipCard);')
-        html_parts.append('gameBoard.appendChild(cardElement);')
-        html_parts.append('});')
-        html_parts.append('}')
+        html_parts.append('const cardEl = document.createElement("div");')
+        html_parts.append('cardEl.className = "card";')
+        html_parts.append('cardEl.innerHTML = `<div class="card-inner"><div class="card-front">🎴</div><div class="card-back">${card}</div></div>`;')
+        html_parts.append('cardEl.dataset.index = index;')
+        html_parts.append('cardEl.dataset.value = card;')
+        html_parts.append('cardEl.addEventListener("click", flipCard);')
+        html_parts.append('gameBoard.appendChild(cardEl);')
+        html_parts.append('}); }')
         html_parts.append('function flipCard() {')
-        html_parts.append('if (!gameActive || this.classList.contains("flipped") || this.classList.contains("matched")) {')
-        html_parts.append('return;')
-        html_parts.append('}')
+        html_parts.append('if (!gameActive || this.classList.contains("flipped") || this.classList.contains("matched")) return;')
         html_parts.append('this.classList.add("flipped");')
-        html_parts.append('this.textContent = this.dataset.value;')
         html_parts.append('flippedCards.push(this);')
         html_parts.append('if (flippedCards.length === 2) {')
-        html_parts.append('attempts++;')
-        html_parts.append('scoreDisplay.textContent = "尝试次数: " + attempts;')
+        html_parts.append('moves++;')
+        html_parts.append('document.getElementById("moves").textContent = moves;')
         html_parts.append('if (flippedCards[0].dataset.value === flippedCards[1].dataset.value) {')
-        html_parts.append('flippedCards.forEach(card => {')
-        html_parts.append('card.classList.add("matched");')
-        html_parts.append('});')
+        html_parts.append('flippedCards.forEach(card => card.classList.add("matched"));')
         html_parts.append('matchedPairs++;')
-        html_parts.append('if (matchedPairs === cards.length) {')
-        html_parts.append('gameActive = false;')
-        html_parts.append('scoreDisplay.textContent = "游戏完成! 尝试次数: " + attempts;')
-        html_parts.append('}')
+        html_parts.append('document.getElementById("pairs").textContent = matchedPairs;')
+        html_parts.append('flippedCards = [];')
+        html_parts.append('if (matchedPairs === cards.length) { gameActive = false; clearInterval(timerInterval); setTimeout(showResult, 500); }')
         html_parts.append('} else {')
         html_parts.append('gameActive = false;')
-        html_parts.append('setTimeout(() => {')
-        html_parts.append('flippedCards.forEach(card => {')
-        html_parts.append('card.classList.remove("flipped");')
-        html_parts.append('card.textContent = "?";')
-        html_parts.append('});')
-        html_parts.append('gameActive = true;')
-        html_parts.append('}, 1000);')
-        html_parts.append('}')
-        html_parts.append('flippedCards = [];')
-        html_parts.append('}')
-        html_parts.append('}')
-        html_parts.append('resetBtn.addEventListener("click", initGame);')
+        html_parts.append('setTimeout(() => { flippedCards.forEach(card => card.classList.remove("flipped")); flippedCards = []; gameActive = true; }, 1000);')
+        html_parts.append('} } }')
+        html_parts.append('function showResult() { const elapsed = Math.floor((Date.now() - startTime) / 1000); const pct = Math.max(0, 100 - moves * 2); let stars = ""; for (let i = 0; i < 3; i++) stars += pct >= (i + 1) * 30 ? "⭐" : "☆"; document.getElementById("stars").textContent = stars; document.getElementById("final-score").textContent = moves + "步"; document.getElementById("result-text").textContent = "用时" + elapsed + "秒"; document.getElementById("result-modal").classList.add("show"); }')
+        html_parts.append('function resetGame() { document.getElementById("result-modal").classList.remove("show"); initGame(); timerInterval = setInterval(updateTimer, 1000); }')
+        html_parts.append('timerInterval = setInterval(updateTimer, 1000);')
         html_parts.append('initGame();')
         html_parts.append('</script>')
         html_parts.append('</body>')
         html_parts.append('</html>')
-        
+
         return ''.join(html_parts)
     
     def _generate_matching_game(self, topic: str, content: list):
         """生成匹配游戏"""
-        # 提取匹配对
         pairs = []
         for item in content:
             if isinstance(item, dict) and 'title' in item and 'content' in item:
@@ -275,8 +298,11 @@ class GameGenerator:
                         'left': item['title'],
                         'right': subitem
                     })
-        
-        # 生成HTML
+
+        import random
+        shuffled_rights = [p['right'] for p in pairs]
+        random.shuffle(shuffled_rights)
+
         html_parts = []
         html_parts.append('<!DOCTYPE html>')
         html_parts.append('<html lang="zh-CN">')
@@ -285,109 +311,127 @@ class GameGenerator:
         html_parts.append('<meta name="viewport" content="width=device-width, initial-scale=1.0">')
         html_parts.append(f'<title>{topic} - 匹配游戏</title>')
         html_parts.append('<style>')
-        html_parts.append('body { font-family: Arial, sans-serif; background-color: #f0f0f0; margin: 0; padding: 20px; }')
-        html_parts.append('.container { max-width: 800px; margin: 0 auto; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }')
-        html_parts.append('h1 { text-align: center; color: #333; }')
-        html_parts.append('.game-area { display: flex; justify-content: space-around; margin: 20px 0; }')
-        html_parts.append('.column { flex: 1; padding: 10px; }')
-        html_parts.append('.item { padding: 10px; margin: 5px 0; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 4px; cursor: grab; text-align: center; }')
+        html_parts.append('* { box-sizing: border-box; margin: 0; padding: 0; }')
+        html_parts.append('body { font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }')
+        html_parts.append('.container { max-width: 1000px; margin: 0 auto; }')
+        html_parts.append('.header { text-align: center; color: white; margin-bottom: 30px; }')
+        html_parts.append('.header h1 { font-size: 2.5em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }')
+        html_parts.append('.score-board { display: flex; justify-content: center; gap: 40px; margin-bottom: 20px; }')
+        html_parts.append('.score-item { background: rgba(255,255,255,0.2); padding: 10px 25px; border-radius: 50px; color: white; font-size: 1.2em; backdrop-filter: blur(5px); }')
+        html_parts.append('.game-area { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }')
+        html_parts.append('.column { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }')
+        html_parts.append('.column-title { text-align: center; font-size: 1.4em; color: #333; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 3px solid #667eea; }')
+        html_parts.append('.items-grid { display: flex; flex-direction: column; gap: 12px; }')
+        html_parts.append('.item { padding: 15px 20px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border-radius: 10px; cursor: grab; text-align: center; font-size: 1.1em; color: #333; transition: all 0.3s ease; border: 2px solid transparent; user-select: none; }')
+        html_parts.append('.item:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); border-color: #667eea; }')
         html_parts.append('.item:active { cursor: grabbing; }')
-        html_parts.append('.drop-zone { min-height: 50px; border: 2px dashed #ccc; border-radius: 4px; margin: 5px 0; padding: 10px; text-align: center; }')
-        html_parts.append('.drop-zone.active { border-color: #4CAF50; background-color: #f0f8f0; }')
-        html_parts.append('.drop-zone.correct { border-color: #4CAF50; background-color: #d4edda; }')
-        html_parts.append('.drop-zone.incorrect { border-color: #f44336; background-color: #f8d7da; }')
-        html_parts.append('#result { margin-top: 20px; padding: 15px; background-color: #e3f2fd; border-radius: 5px; text-align: center; font-size: 18px; font-weight: bold; }')
-        html_parts.append('#reset-btn { display: block; width: 100%; padding: 10px; margin-top: 20px; background-color: #f44336; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; }')
-        html_parts.append('#reset-btn:hover { background-color: #da190b; }')
+        html_parts.append('.item.dragging { opacity: 0.5; transform: scale(1.05); }')
+        html_parts.append('.item.matched { background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); border-color: #28a745; color: #155724; cursor: default; }')
+        html_parts.append('.drop-zone { padding: 15px 20px; background: #f8f9fa; border: 3px dashed #dee2e6; border-radius: 10px; text-align: center; font-size: 1.1em; color: #666; transition: all 0.3s ease; min-height: 60px; display: flex; align-items: center; justify-content: center; }')
+        html_parts.append('.drop-zone.dragover { border-color: #667eea; background: #e8eaf6; transform: scale(1.02); }')
+        html_parts.append('.drop-zone.correct { background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); border: 3px solid #28a745; color: #155724; animation: pulse 0.5s ease; }')
+        html_parts.append('.drop-zone.incorrect { background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); border-color: #dc3545; animation: shake 0.5s ease; }')
+        html_parts.append('@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }')
+        html_parts.append('@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }')
+        html_parts.append('.result-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; }')
+        html_parts.append('.result-modal.show { display: flex; }')
+        html_parts.append('.result-content { background: white; padding: 40px 60px; border-radius: 20px; text-align: center; animation: popIn 0.5s ease; }')
+        html_parts.append('@keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }')
+        html_parts.append('.result-content h2 { font-size: 2.5em; color: #28a745; margin-bottom: 20px; }')
+        html_parts.append('.result-content p { font-size: 1.3em; color: #666; margin-bottom: 30px; }')
+        html_parts.append('.btn { padding: 15px 40px; font-size: 1.2em; border: none; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; }')
+        html_parts.append('.btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }')
+        html_parts.append('.btn-primary:hover { transform: translateY(-3px); box-shadow: 0 5px 20px rgba(102,126,234,0.4); }')
+        html_parts.append('.progress-bar { background: rgba(255,255,255,0.3); height: 8px; border-radius: 4px; margin-bottom: 30px; overflow: hidden; }')
+        html_parts.append('.progress-fill { background: white; height: 100%; border-radius: 4px; transition: width 0.3s ease; }')
         html_parts.append('</style>')
         html_parts.append('</head>')
         html_parts.append('<body>')
         html_parts.append('<div class="container">')
+        html_parts.append('<div class="header">')
         html_parts.append(f'<h1>{topic}</h1>')
+        html_parts.append('<p style="font-size:1.2em;opacity:0.9;">拖动左侧选项到右侧正确的位置</p>')
+        html_parts.append('</div>')
+        html_parts.append('<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>')
+        html_parts.append('<div class="score-board">')
+        html_parts.append('<div class="score-item">用时: <span id="timer">0</span>秒</div>')
+        html_parts.append('<div class="score-item">正确: <span id="correct-count">0</span>/<span id="total-count">' + str(len(pairs)) + '</span></div>')
+        html_parts.append('<div class="score-item">错误: <span id="wrong-count">0</span></div>')
+        html_parts.append('</div>')
         html_parts.append('<div class="game-area">')
         html_parts.append('<div class="column">')
-        html_parts.append('<h3>左侧项目</h3>')
-        html_parts.append('<div id="left-items">')
-        
+        html_parts.append('<div class="column-title">🎯 请匹配</div>')
+        html_parts.append('<div class="items-grid" id="left-items">')
+
         for i, pair in enumerate(pairs):
-            html_parts.append(f'<div class="item" draggable="true" data-id="{i}">{pair["left"]}</div>')
-        
+            html_parts.append(f'<div class="item" draggable="true" data-id="{i}" id="left-{i}">{pair["left"]}</div>')
+
         html_parts.append('</div>')
         html_parts.append('</div>')
         html_parts.append('<div class="column">')
-        html_parts.append('<h3>右侧匹配</h3>')
-        html_parts.append('<div id="right-items">')
-        
-        for i, pair in enumerate(pairs):
-            html_parts.append(f'<div class="drop-zone" data-id="{i}">{pair["right"]}</div>')
-        
+        html_parts.append('<div class="column-title">📝 拖到这里</div>')
+        html_parts.append('<div class="items-grid" id="right-items">')
+
+        for i, right_text in enumerate(shuffled_rights):
+            original_index = pairs.index(next(p for p in pairs if p['right'] == right_text))
+            html_parts.append(f'<div class="drop-zone" data-target="{original_index}" id="drop-{i}">{right_text}</div>')
+
         html_parts.append('</div>')
         html_parts.append('</div>')
         html_parts.append('</div>')
-        html_parts.append('<div id="result"></div>')
-        html_parts.append('<button id="reset-btn">重新开始</button>')
+        html_parts.append('</div>')
+        html_parts.append('<div class="result-modal" id="result-modal">')
+        html_parts.append('<div class="result-content">')
+        html_parts.append('<h2 id="result-title">🎉 恭喜通关!</h2>')
+        html_parts.append('<p id="result-text">你完成了所有匹配!</p>')
+        html_parts.append('<button class="btn btn-primary" onclick="resetGame()">再玩一次</button>')
+        html_parts.append('</div>')
         html_parts.append('</div>')
         html_parts.append('<script>')
         html_parts.append(f'const pairs = {json.dumps(pairs)};')
         html_parts.append('const leftItems = document.querySelectorAll(".item");')
         html_parts.append('const dropZones = document.querySelectorAll(".drop-zone");')
-        html_parts.append('const resultDiv = document.getElementById("result");')
-        html_parts.append('const resetBtn = document.getElementById("reset-btn");')
+        html_parts.append('let correctCount = 0;')
+        html_parts.append('let wrongCount = 0;')
+        html_parts.append('let startTime = Date.now();')
+        html_parts.append('let timerInterval;')
         html_parts.append('let draggedItem = null;')
+        html_parts.append('let draggedId = null;')
+        html_parts.append('function updateTimer() { document.getElementById("timer").textContent = Math.floor((Date.now() - startTime) / 1000); }')
+        html_parts.append('function updateProgress() { const pct = (correctCount / pairs.length) * 100; document.getElementById("progress").style.width = pct + "%"; }')
+        html_parts.append('timerInterval = setInterval(updateTimer, 1000);')
         html_parts.append('leftItems.forEach(item => {')
-        html_parts.append('item.addEventListener("dragstart", function(e) {')
-        html_parts.append('draggedItem = this;')
-        html_parts.append('setTimeout(() => this.style.opacity = "0.5", 0);')
-        html_parts.append('});')
-        html_parts.append('item.addEventListener("dragend", function() {')
-        html_parts.append('this.style.opacity = "1";')
-        html_parts.append('draggedItem = null;')
-        html_parts.append('});')
+        html_parts.append('item.addEventListener("dragstart", function(e) { draggedItem = this; draggedId = this.dataset.id; this.classList.add("dragging"); e.dataTransfer.effectAllowed = "move"; });')
+        html_parts.append('item.addEventListener("dragend", function() { this.classList.remove("dragging"); draggedItem = null; draggedId = null; });')
         html_parts.append('});')
         html_parts.append('dropZones.forEach(zone => {')
-        html_parts.append('zone.addEventListener("dragover", function(e) {')
-        html_parts.append('e.preventDefault();')
-        html_parts.append('this.classList.add("active");')
-        html_parts.append('});')
-        html_parts.append('zone.addEventListener("dragleave", function() {')
-        html_parts.append('this.classList.remove("active");')
-        html_parts.append('});')
+        html_parts.append('zone.addEventListener("dragover", function(e) { e.preventDefault(); this.classList.add("dragover"); });')
+        html_parts.append('zone.addEventListener("dragleave", function() { this.classList.remove("dragover"); });')
         html_parts.append('zone.addEventListener("drop", function(e) {')
         html_parts.append('e.preventDefault();')
-        html_parts.append('this.classList.remove("active");')
-        html_parts.append('const draggedId = draggedItem.dataset.id;')
-        html_parts.append('const dropId = this.dataset.id;')
-        html_parts.append('if (draggedId === dropId) {')
+        html_parts.append('this.classList.remove("dragover");')
+        html_parts.append('if (this.classList.contains("correct")) return;')
+        html_parts.append('const targetId = this.dataset.target;')
+        html_parts.append('if (draggedId === targetId) {')
         html_parts.append('this.classList.add("correct");')
-        html_parts.append('draggedItem.style.opacity = "0.5";')
-        html_parts.append('draggedItem.draggable = false;')
+        html_parts.append('document.getElementById("left-" + draggedId).classList.add("matched");')
+        html_parts.append('document.getElementById("left-" + draggedId).draggable = false;')
+        html_parts.append('correctCount++;')
+        html_parts.append('document.getElementById("correct-count").textContent = correctCount;')
+        html_parts.append('updateProgress();')
+        html_parts.append('if (correctCount === pairs.length) { clearInterval(timerInterval); setTimeout(showResult, 500); }')
         html_parts.append('} else {')
         html_parts.append('this.classList.add("incorrect");')
-        html_parts.append('setTimeout(() => this.classList.remove("incorrect"), 1000);')
-        html_parts.append('}')
-        html_parts.append('checkGameComplete();')
-        html_parts.append('});')
-        html_parts.append('});')
-        html_parts.append('function checkGameComplete() {')
-        html_parts.append('const correctZones = document.querySelectorAll(".drop-zone.correct");')
-        html_parts.append('if (correctZones.length === pairs.length) {')
-        html_parts.append('resultDiv.textContent = "游戏完成! 所有匹配都正确!";')
-        html_parts.append('}')
-        html_parts.append('}')
-        html_parts.append('resetBtn.addEventListener("click", function() {')
-        html_parts.append('dropZones.forEach(zone => {')
-        html_parts.append('zone.classList.remove("correct", "incorrect");')
-        html_parts.append('});')
-        html_parts.append('leftItems.forEach(item => {')
-        html_parts.append('item.style.opacity = "1";')
-        html_parts.append('item.draggable = true;')
-        html_parts.append('});')
-        html_parts.append('resultDiv.textContent = "";')
-        html_parts.append('});')
+        html_parts.append('wrongCount++;')
+        html_parts.append('document.getElementById("wrong-count").textContent = wrongCount;')
+        html_parts.append('setTimeout(() => this.classList.remove("incorrect"), 800);')
+        html_parts.append('} }); });')
+        html_parts.append('function showResult() { const elapsed = Math.floor((Date.now() - startTime) / 1000); document.getElementById("result-text").textContent = "用时" + elapsed + "秒，错误" + wrongCount + "次"; document.getElementById("result-modal").classList.add("show"); }')
+        html_parts.append('function resetGame() { location.reload(); }')
         html_parts.append('</script>')
         html_parts.append('</body>')
         html_parts.append('</html>')
-        
+
         return ''.join(html_parts)
 
 # 测试代码
@@ -495,12 +539,13 @@ def _generate_game_content_with_ai(self, topic: str, game_type: str):
         list: 游戏内容
     """
     if game_type == "quiz":
-        prompt = f"请为'{topic}'主题生成5个问答游戏题目，每个题目包含一个问题和4个选项（其中一个是正确答案）。\n"
+        prompt = f"请为'{topic}'主题生成5个问答游戏题目，每个题目包含一个问题、4个选项和1个正确答案的索引（从0开始）。\n"
         prompt += "请以以下格式输出：\n"
         prompt += "[\n"
         prompt += "  {\n"
         prompt += "    \"title\": \"问题内容\",\n"
-        prompt += "    \"content\": [\"选项1\", \"选项2\", \"选项3\", \"选项4\"]\n"
+        prompt += "    \"content\": [\"选项1\", \"选项2\", \"选项3\", \"选项4\"],\n"
+        prompt += "    \"correct\": 正确答案的索引（0-3）\n"
         prompt += "  },\n"
         prompt += "  ...\n"
         prompt += "]\n"
@@ -522,17 +567,18 @@ def _generate_game_content_with_ai(self, topic: str, game_type: str):
         prompt += "请确保概念与相关内容之间有明确的对应关系。"
     else:
         # 默认生成问答游戏内容
-        prompt = f"请为'{topic}'主题生成5个问答游戏题目，每个题目包含一个问题和4个选项（其中一个是正确答案）。\n"
+        prompt = f"请为'{topic}'主题生成5个问答游戏题目，每个题目包含一个问题、4个选项和1个正确答案的索引（从0开始）。\n"
         prompt += "请以以下格式输出：\n"
         prompt += "[\n"
         prompt += "  {\n"
         prompt += "    \"title\": \"问题内容\",\n"
-        prompt += "    \"content\": [\"选项1\", \"选项2\", \"选项3\", \"选项4\"]\n"
+        prompt += "    \"content\": [\"选项1\", \"选项2\", \"选项3\", \"选项4\"],\n"
+        prompt += "    \"correct\": 正确答案的索引（0-3）\n"
         prompt += "  },\n"
         prompt += "  ...\n"
         prompt += "]\n"
         prompt += "请确保问题具有教育意义，选项合理，且正确答案明确。"
-    
+
     try:
         response = self.llm_client.generate(prompt)
         # 尝试解析响应
@@ -654,23 +700,28 @@ def _get_default_game_content(self, topic: str, game_type: str):
         return [
             {
                 'title': f'{topic}的基本概念是什么?',
-                'content': ['选项1', '选项2', '选项3', '选项4']
+                'content': ['选项1', '选项2', '选项3', '选项4'],
+                'correct': 0
             },
             {
                 'title': f'{topic}的重要性体现在哪些方面?',
-                'content': ['选项1', '选项2', '选项3', '选项4']
+                'content': ['选项1', '选项2', '选项3', '选项4'],
+                'correct': 0
             },
             {
                 'title': f'{topic}的应用场景有哪些?',
-                'content': ['选项1', '选项2', '选项3', '选项4']
+                'content': ['选项1', '选项2', '选项3', '选项4'],
+                'correct': 0
             },
             {
                 'title': f'{topic}的发展历史是怎样的?',
-                'content': ['选项1', '选项2', '选项3', '选项4']
+                'content': ['选项1', '选项2', '选项3', '选项4'],
+                'correct': 0
             },
             {
                 'title': f'{topic}的未来趋势是什么?',
-                'content': ['选项1', '选项2', '选项3', '选项4']
+                'content': ['选项1', '选项2', '选项3', '选项4'],
+                'correct': 0
             }
         ]
     elif game_type == "memory":

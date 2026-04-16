@@ -324,126 +324,32 @@ class WordGenerator:
         """
         使用AI生成完整教案结构
         """
-        prompt = f"请为'{topic}'主题生成一个完整的教案，包含以下部分：\n"
-        prompt += "1. 教学目标（3-5个）\n"
-        prompt += "2. 教学方法（3-4种）\n"
-        prompt += "3. 教学过程（详细的教学环节，每个环节包含内容和时长）\n"
-        prompt += "4. 课堂活动设计（2-3个活动，每个活动包含名称、描述、所需材料和时长）\n"
-        prompt += "5. 课后作业（3-4个）\n"
-        prompt += "请以结构化的方式输出，便于后续处理。"
-        
+        prompt = '请为"' + topic + '"主题生成一个详尽完整的教案。JSON格式输出，包含以下完整字段：\n\n{\n    "teaching_objectives": ["目标1", "目标2", "目标3", "目标4"],\n    "teaching_methods": ["方法1", "方法2", "方法3", "方法4", "方法5"],\n    "teaching_process": [\n        {"title": "导入环节", "content": ["内容1", "内容2", "内容3", "内容4", "内容5"], "duration": "5分钟"},\n        {"title": "新授环节", "content": ["内容1", "内容2", "内容3", "内容4", "内容5", "内容6", "内容7"], "duration": "20分钟"},\n        {"title": "练习环节", "content": ["内容1", "内容2", "内容3", "内容4", "内容5"], "duration": "10分钟"},\n        {"title": "总结环节", "content": ["内容1", "内容2", "内容3", "内容4"], "duration": "5分钟"}\n    ],\n    "classroom_activities": [\n        {"title": "活动1", "description": "描述1", "materials": ["材料1", "材料2"], "duration": "5分钟"},\n        {"title": "活动2", "description": "描述2", "materials": ["材料1"], "duration": "5分钟"}\n    ],\n    "homework": ["作业1", "作业2", "作业3", "作业4", "作业5"]\n}\n\n重要：必须用与"' + topic + '"相关的真实教学内容填充所有字段。'
+
         try:
             response = self.llm_client.generate(prompt)
-            # 这里简化处理，实际可能需要更复杂的解析
-            # 返回默认结构
-            return {
-                'teaching_objectives': [
-                    f"了解{topic}的基本概念",
-                    f"掌握{topic}的核心内容",
-                    f"能够应用{topic}的相关知识"
-                ],
-                'teaching_methods': [
-                    "讲授法",
-                    "讨论法",
-                    "案例分析法",
-                    "互动问答"
-                ],
-                'teaching_process': [
-                    {
-                        'title': "导入环节",
-                        'content': ["引入主题", "激发兴趣"],
-                        'duration': "5分钟"
-                    },
-                    {
-                        'title': "核心内容讲解",
-                        'content': ["讲解重点", "分析难点"],
-                        'duration': "20分钟"
-                    },
-                    {
-                        'title': "互动讨论",
-                        'content': ["分组讨论", "分享观点"],
-                        'duration': "15分钟"
-                    },
-                    {
-                        'title': "总结归纳",
-                        'content': ["回顾重点", "布置作业"],
-                        'duration': "5分钟"
-                    }
-                ],
-                'classroom_activities': [
-                    {
-                        'title': "小组讨论",
-                        'description': "根据课程内容，分组讨论相关问题",
-                        'materials': ["白板", "马克笔"],
-                        'duration': "15分钟"
-                    },
-                    {
-                        'title': "知识问答",
-                        'description': "基于课程内容进行互动问答",
-                        'materials': ["PPT"],
-                        'duration': "10分钟"
-                    }
-                ],
-                'homework': [
-                    f"复习{topic}的核心内容",
-                    f"完成与{topic}相关的练习题",
-                    f"查找{topic}的相关资料，扩展知识面"
-                ]
-            }
+            import json
+            import re
+
+            json_match = re.search(r'\{[\s\S]*\}', response)
+            if json_match:
+                json_str = json_match.group()
+                try:
+                    lesson_plan_data = json.loads(json_str)
+                    return lesson_plan_data
+                except json.JSONDecodeError as e:
+                    print(f"JSON解析失败: {e}，尝试修复...")
+                    json_str = json_str.replace('\n', ' ').replace('\r', '')
+                    json_str = re.sub(r',\s*([\]}])', r'\1', json_str)
+                    try:
+                        lesson_plan_data = json.loads(json_str)
+                        return lesson_plan_data
+                    except:
+                        pass
+                    raise ValueError(f"无法解析AI返回的JSON内容: {json_str[:200]}")
+            else:
+                raise ValueError("无法解析AI返回的JSON内容")
+
         except Exception as e:
             print(f"生成完整教案失败: {str(e)}")
-            # 失败时返回默认结构
-            return {
-                'teaching_objectives': [
-                    f"了解{topic}的基本概念",
-                    f"掌握{topic}的核心内容",
-                    f"能够应用{topic}的相关知识"
-                ],
-                'teaching_methods': [
-                    "讲授法",
-                    "讨论法",
-                    "案例分析法",
-                    "互动问答"
-                ],
-                'teaching_process': [
-                    {
-                        'title': "导入环节",
-                        'content': ["引入主题", "激发兴趣"],
-                        'duration': "5分钟"
-                    },
-                    {
-                        'title': "核心内容讲解",
-                        'content': ["讲解重点", "分析难点"],
-                        'duration': "20分钟"
-                    },
-                    {
-                        'title': "互动讨论",
-                        'content': ["分组讨论", "分享观点"],
-                        'duration': "15分钟"
-                    },
-                    {
-                        'title': "总结归纳",
-                        'content': ["回顾重点", "布置作业"],
-                        'duration': "5分钟"
-                    }
-                ],
-                'classroom_activities': [
-                    {
-                        'title': "小组讨论",
-                        'description': "根据课程内容，分组讨论相关问题",
-                        'materials': ["白板", "马克笔"],
-                        'duration': "15分钟"
-                    },
-                    {
-                        'title': "知识问答",
-                        'description': "基于课程内容进行互动问答",
-                        'materials': ["PPT"],
-                        'duration': "10分钟"
-                    }
-                ],
-                'homework': [
-                    f"复习{topic}的核心内容",
-                    f"完成与{topic}相关的练习题",
-                    f"查找{topic}的相关资料，扩展知识面"
-                ]
-            }
+            raise
