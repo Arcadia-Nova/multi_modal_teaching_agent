@@ -161,4 +161,7 @@ class DialogueService:
             Message.session_id == session_id
         ).first()
 
-        return messages.content
+        if messages:
+            return messages.content
+        else:
+            return "无对话内容"
