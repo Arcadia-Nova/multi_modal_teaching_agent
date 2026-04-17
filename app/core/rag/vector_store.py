@@ -72,3 +72,32 @@ class ChromaVectorStore:
     def delete_collection(self):
         """删除整个集合（慎用）"""
         self.client.delete_collection(self.collection.name)
+
+    def upsert_documents(self, ids: List[str], documents: List[str], metadatas: Optional[List[Dict]] = None):
+        """批量插入或更新文档（ID 存在则更新，不存在则插入）"""
+        if metadatas is None:
+            metadatas = [{}] * len(documents)
+        batch_size = 100
+        for i in range(0, len(documents), batch_size):
+            self.collection.upsert(
+                ids=ids[i:i + batch_size],
+                documents=documents[i:i + batch_size],
+                metadatas=metadatas[i:i + batch_size]
+            )
+
+    def delete_by_metadata(self, filter_dict: Dict[str, str]) -> int:
+        """
+        根据元数据删除文档，返回删除数量
+        filter_dict 示例: {"source_file": "example.pdf"}
+        """
+        # 先查询符合条件的文档 ID
+        results = self.collection.get(where=filter_dict)
+        ids = results['ids'] if results and 'ids' in results else []
+        if ids:
+            self.collection.delete(ids=ids)
+        return len(ids)
+
+    def get_existing_ids_by_metadata(self, filter_dict: Dict[str, str]) -> List[str]:
+        """获取符合元数据条件的所有文档 ID"""
+        results = self.collection.get(where=filter_dict)
+        return results['ids'] if results and 'ids' in results else []
