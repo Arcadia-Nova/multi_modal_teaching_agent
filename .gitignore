@@ -2,7 +2,6 @@
 __pycache__/
 *.pyc
 *.pyo# created by virtualenv automatically
-*
 
 # 忽略 JetBrains IDE 配置目录
 .idea/

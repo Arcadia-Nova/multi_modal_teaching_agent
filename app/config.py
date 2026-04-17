@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from typing import List, Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
@@ -43,7 +44,7 @@ class Settings(BaseSettings):
     TOP_K_RETRIEVAL: int = 5
 
     # --- 本地知识库路径 ---
-    KNOWLEDGE_BASE_DIR: str = "../../../knowledge_base/documents"
+    KNOWLEDGE_BASE_DIR: str = "../../knowledge_base/documents"
     EMBEDDING_MODEL_NAME: str = "BAAI/bge-large-zh-v1.5"
 
     #--- 向量库路径 ---
@@ -83,3 +84,15 @@ os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 os.makedirs(settings.EXPORT_DIR, exist_ok=True)
 os.makedirs(settings.VECTOR_DB_PATH, exist_ok=True)
 os.makedirs(settings.KNOWLEDGE_BASE_DIR, exist_ok=True)
+
+# 计算基于项目根目录的绝对路径（派生路径，不作为配置字段）
+BASE_DIR = Path(__file__).resolve().parent.parent  # 项目根目录
+KNOWLEDGE_BASE_DIR = BASE_DIR / "knowledge_base" / "documents"
+VECTOR_STORE_PATH = BASE_DIR / "vector_store"
+# 如果 settings 中的路径是相对路径，则转换为绝对路径
+settings.KNOWLEDGE_BASE_DIR = str(KNOWLEDGE_BASE_DIR)
+settings.VECTOR_STORE_PATH = str(VECTOR_STORE_PATH)
+if not os.path.isabs(settings.UPLOAD_DIR):
+    settings.UPLOAD_DIR = str(BASE_DIR / settings.UPLOAD_DIR)
+if not os.path.isabs(settings.DATABASE_PATH):
+    settings.DATABASE_PATH = str(BASE_DIR / settings.DATABASE_PATH)

@@ -6,7 +6,7 @@ from typing import List, Dict
 from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader, UnstructuredPowerPointLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
-from app.config import settings
+from app.config import settings,BASE_DIR,KNOWLEDGE_BASE_DIR
 from app.core.rag.vector_store import ChromaVectorStore
 
 # 状态文件路径（保存在向量库目录下）
@@ -89,7 +89,10 @@ def _process_file(file_path: str, vector_store: ChromaVectorStore) -> int:
 
 def build_knowledge_base_incremental(collection_name: str = "teaching_knowledge_base"):
     """增量构建知识库：仅处理新增或修改的文件"""
-    docs_dir = "../../../knowledge_base/documents"
+    docs_dir = settings.KNOWLEDGE_BASE_DIR
+    print("当前工作目录:", os.getcwd())
+    print("文档目录绝对路径:", os.path.abspath(docs_dir))
+    print("目录是否存在:", os.path.exists(docs_dir))
     if not os.path.exists(docs_dir):
         print(f"知识库目录不存在: {docs_dir}")
         return
@@ -142,7 +145,11 @@ def build_knowledge_base_incremental(collection_name: str = "teaching_knowledge_
 
 def build_knowledge_base_full(collection_name: str = "teaching_knowledge_base"):
     """全量构建（原逻辑，保留作为备用）"""
-    docs_dir = "../../../knowledge_base/documents"
+    docs_dir = settings.KNOWLEDGE_BASE_DIR
+    print("主目录:",BASE_DIR,",",KNOWLEDGE_BASE_DIR)
+    print("当前工作目录:", os.getcwd())
+    print("文档目录绝对路径:", os.path.abspath(docs_dir))
+    print("目录是否存在:", os.path.exists(docs_dir))
     if not os.path.exists(docs_dir):
         print(f"知识库目录不存在: {docs_dir}")
         return
@@ -206,4 +213,4 @@ def build_knowledge_base_full(collection_name: str = "teaching_knowledge_base"):
 
 if __name__ == "__main__":
     # 默认使用增量构建，也可改为全量构建
-    build_knowledge_base_incremental()
+    build_knowledge_base_full()
