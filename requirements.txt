@@ -1,16 +1,9 @@
 pydantic
-torch
-sqlalchemy
-
-langchain-text-splitters
-langchain-core
-langchain-community
-langchain
-pypdf
-docx2txt
-
 pydantic-settings
 
+torch
+# ========== 数据库 ==========
+sqlalchemy
 # ========== Web 框架 ==========
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
@@ -52,6 +45,13 @@ paddleocr==3.4.0
 paddlepaddle==3.1.1
 # 如有 GPU（CUDA 11.7），请改为：
 # paddlepaddle-gpu==2.6.1
+
+langchain-text-splitters
+langchain-core
+langchain-community
+langchain
+pypdf
+docx2txt
 
 # ========== 视频处理 ==========
 opencv-python==4.8.1.78
