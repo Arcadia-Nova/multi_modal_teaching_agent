@@ -98,7 +98,7 @@ class MessageService:
 
 
         role = str("user")
-        des = str("这是用户上传的文档的分析,请进行解析:")
+        des = str("这是用户上传的文档的分析,请进行解析并与用户的提问合在一起理解:")
 
         return [
             { "role": role ,"content": des+ref_list[i]}

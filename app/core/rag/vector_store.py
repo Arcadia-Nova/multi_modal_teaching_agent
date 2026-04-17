@@ -49,11 +49,16 @@ class ChromaVectorStore:
             )
 
     def similarity_search(self, query: str, top_k: int = 5) -> List[Dict]:
+        print(f"Collection count: {self.collection.count()}")
         """向量相似度检索，返回文档内容和元数据"""
         results = self.collection.query(
             query_texts=[query],
             n_results=top_k
         )
+        print("Results keys:", results.keys())
+        print("Documents:", results['documents'])
+        print("Metadatas:", results['metadatas'])
+        print("Distances:", results['distances'])
         if not results['documents']:
             return []
         return [

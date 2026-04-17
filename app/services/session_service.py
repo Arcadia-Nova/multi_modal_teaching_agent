@@ -35,4 +35,4 @@ class SessionService:
             self.db.commit()
 
     def get_all_session(self):
-        return self.db.query(ConversationSession).all()
+        return self.db.query(ConversationSession).order_by(ConversationSession.created_at.desc()).all()
