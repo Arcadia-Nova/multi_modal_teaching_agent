@@ -1,0 +1,8 @@
+# 忽略 Python 缓存
+__pycache__/
+*.pyc
+*.pyo# created by virtualenv automatically
+*
+
+# 忽略 JetBrains IDE 配置目录
+.idea/
