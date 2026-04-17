@@ -21,11 +21,12 @@ def chunk_documents(docs: List[Document], chunk_size: int = 512, chunk_overlap: 
 
 def build_knowledge_base(collection_name: str = "teaching_knowledge_base"):
     """扫描 knowledge_base/documents 并构建索引"""
-    docs_dir = settings.KNOWLEDGE_BASE_DIR
+    # docs_dir = settings.KNOWLEDGE_BASE_DIR
+    docs_dir = "../../../knowledge_base/documents"
     if not os.path.exists(docs_dir):
         print(f"知识库目录不存在: {docs_dir}")
         return
-
+    print("开始处理")
     all_chunks = []
     print(len(os.listdir(docs_dir)))
     for file_name in os.listdir(docs_dir):
