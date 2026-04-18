@@ -11,7 +11,7 @@ from app.core.multimodal.video_parser import VideoParser
 from app.core.multimodal.voice_transcriber import VoiceTranscriber
 from app.models.reference import UploadedFile, FileType, ParsedReference
 from app.models.conversation import Message
-from app.utils.file_utils import save_upload_file
+from app.utils.file_utils import save_upload_file, save_upload_file_and_rag
 from app.config import settings
 
 
@@ -97,6 +97,15 @@ class InputService:
             file_path,
             file_type
         )
+
+        return file_id
+
+    async def upload_knowledge(self,background_tasks: BackgroundTasks, file, reference_note: str = None) -> str:
+        """上传参考资料，保存记录，返回 file_id"""
+        import uuid
+        file_id = str(uuid.uuid4())
+        file_dir = os.path.join(settings.KNOWLEDGE_BASE_DIR,"" , "")
+        file_path = await save_upload_file_and_rag(file, file_dir)
 
         return file_id
 
