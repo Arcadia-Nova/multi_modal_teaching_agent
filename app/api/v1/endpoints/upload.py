@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from typing import Optional
 from app.api import deps
 from app.api.v1.models.common import FileUploadResponse, NoteUpdateResponse, ParsedResultResponse
+from app.core.rag import build_knowledge_base_incremental
 from app.services.input_service import InputService
 
 router = APIRouter()
@@ -42,6 +43,34 @@ async def upload_file(
         message="文件上传成功，后台解析中"
     )
 
+@router.post("/knowledge_base_file", response_model=FileUploadResponse)
+async def upload_knowledge_base_file(
+        file: UploadFile = File(...),
+        reference_note: Optional[str] = Form(None),
+        background_tasks: BackgroundTasks = None,
+        input_svc: InputService = Depends(get_input_service)
+):
+    """上传知识库参考资料，支持PDF/Word/PPT"""
+    # 校验文件类型
+    allowed_extensions = ['.pdf', '.docx', '.pptx']
+    ext = os.path.splitext(file.filename)[1].lower()
+    if ext not in allowed_extensions:
+        raise HTTPException(status_code=415, detail=f"不支持的文件类型: {ext}")
+
+    # 调用服务层保存并触发异步解析
+    file_id = await input_svc.upload_knowledge(
+        file=file,
+        reference_note=reference_note,
+        background_tasks=background_tasks
+    )
+
+    background_tasks.add_task(build_knowledge_base_incremental)
+
+    return FileUploadResponse(
+        file_id=file_id,
+        file_name=file.filename,
+        message="文件上传成功，本地知识库增量构建中"
+    )
 
 @router.put("/{file_id}/note", response_model=NoteUpdateResponse)
 def add_reference_note(
