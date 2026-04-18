@@ -118,12 +118,14 @@ async def generate_ppt_with_ai(request: GeneratePPTWithAIRequest):
     使用AI生成PPT
     
     - **topic**: PPT主题
+    - **requirements**: 自定义要求（可选）
     - **output_filename**: 输出文件名（可选）
     """
     try:
         # 调用AI生成服务
         result = generation_service.generate_ppt_with_ai(
             topic=request.topic,
+            requirements=request.requirements,
             output_filename=request.output_filename
         )
         
@@ -161,12 +163,14 @@ async def generate_lesson_plan_with_ai(request: GenerateLessonPlanWithAIRequest)
     使用AI生成教案
     
     - **topic**: 教案主题
+    - **requirements**: 自定义要求（可选）
     - **output_filename**: 输出文件名（可选）
     """
     try:
         # 调用AI生成服务
         result = generation_service.generate_lesson_plan_with_ai(
             topic=request.topic,
+            requirements=request.requirements,
             output_filename=request.output_filename
         )
         
@@ -205,6 +209,7 @@ async def generate_game_with_ai(request: GenerateGameWithAIRequest):
     
     - **topic**: 游戏主题
     - **game_type**: 游戏类型 (quiz, memory, matching)
+    - **requirements**: 自定义要求（可选）
     - **output_filename**: 输出文件名（可选）
     """
     try:
@@ -212,6 +217,7 @@ async def generate_game_with_ai(request: GenerateGameWithAIRequest):
         result = generation_service.generate_game_with_ai(
             topic=request.topic,
             game_type=request.game_type,
+            requirements=request.requirements,
             output_filename=request.output_filename
         )
         

@@ -165,19 +165,20 @@ class WordGenerator:
             output_filename
         )
     
-    def generate_lesson_plan_with_ai(self, topic: str, output_filename: str = None):
+    def generate_lesson_plan_with_ai(self, topic: str, requirements: str = None, output_filename: str = None):
         """
         使用AI生成完整教案
         
         Args:
             topic: 教案主题
+            requirements: 自定义要求
             output_filename: 输出文件名
             
         Returns:
             str: 生成的Word文件路径
         """
         # 使用AI生成完整教案结构
-        lesson_plan_data = self._generate_full_lesson_plan_with_ai(topic)
+        lesson_plan_data = self._generate_full_lesson_plan_with_ai(topic, requirements)
         
         # 调用生成教案方法
         return self.generate_lesson_plan(
@@ -320,11 +321,14 @@ class WordGenerator:
                 f"查找{topic}的相关资料，扩展知识面"
             ]
     
-    def _generate_full_lesson_plan_with_ai(self, topic: str):
+    def _generate_full_lesson_plan_with_ai(self, topic: str, requirements: str = None):
         """
         使用AI生成完整教案结构
         """
         prompt = '请为"' + topic + '"主题生成一个详尽完整的教案。JSON格式输出，包含以下完整字段：\n\n{\n    "teaching_objectives": ["目标1", "目标2", "目标3", "目标4"],\n    "teaching_methods": ["方法1", "方法2", "方法3", "方法4", "方法5"],\n    "teaching_process": [\n        {"title": "导入环节", "content": ["内容1", "内容2", "内容3", "内容4", "内容5"], "duration": "5分钟"},\n        {"title": "新授环节", "content": ["内容1", "内容2", "内容3", "内容4", "内容5", "内容6", "内容7"], "duration": "20分钟"},\n        {"title": "练习环节", "content": ["内容1", "内容2", "内容3", "内容4", "内容5"], "duration": "10分钟"},\n        {"title": "总结环节", "content": ["内容1", "内容2", "内容3", "内容4"], "duration": "5分钟"}\n    ],\n    "classroom_activities": [\n        {"title": "活动1", "description": "描述1", "materials": ["材料1", "材料2"], "duration": "5分钟"},\n        {"title": "活动2", "description": "描述2", "materials": ["材料1"], "duration": "5分钟"}\n    ],\n    "homework": ["作业1", "作业2", "作业3", "作业4", "作业5"]\n}\n\n重要：必须用与"' + topic + '"相关的真实教学内容填充所有字段。'
+
+        if requirements:
+            prompt += f'\n\n用户特殊要求：{requirements}'
 
         try:
             response = self.llm_client.generate(prompt)

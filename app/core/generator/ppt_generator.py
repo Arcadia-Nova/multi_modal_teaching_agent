@@ -129,19 +129,20 @@ class PPTGenerator:
         
         return self.generate_ppt(topic, content, output_filename, template_id)
     
-    def generate_ppt_with_ai(self, topic: str, output_filename: str = None):
+    def generate_ppt_with_ai(self, topic: str, requirements: str = None, output_filename: str = None):
         """
         使用AI生成完整PPT
 
         Args:
             topic: PPT主题
+            requirements: 自定义要求
             output_filename: 输出文件名
 
         Returns:
             str: 生成的PPT文件路径
         """
         # 使用AI生成PPT内容
-        outline = self._generate_ppt_outline_with_ai(topic, None)
+        outline = self._generate_ppt_outline_with_ai(topic, requirements)
 
         # 提取内容
         content = []
@@ -157,7 +158,11 @@ class PPTGenerator:
         if template:
             # 使用模板生成PPT
             print(f"使用模板: {template['name']}")
-            return self.generate_ppt_from_template(template['path'], topic, content, output_filename)
+            try:
+                return self.generate_ppt_from_template(template['path'], topic, content, output_filename)
+            except Exception as e:
+                print(f"模板加载失败: {e}，使用默认方式生成")
+                return self.generate_ppt(topic, content, output_filename)
         else:
             # 如果没有可用模板，使用默认方式生成
             print("没有可用模板，使用默认方式生成")
@@ -661,7 +666,8 @@ class PPTGenerator:
 
         if os.path.exists(templates_dir):
             for filename in os.listdir(templates_dir):
-                if filename.endswith('.pptx'):
+                # 过滤掉临时文件（以~$开头）和无效文件
+                if filename.endswith('.pptx') and not filename.startswith('~$'):
                     template_path = os.path.join(templates_dir, filename)
                     templates.append({
                         'id': filename.replace('.pptx', ''),

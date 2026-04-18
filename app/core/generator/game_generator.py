@@ -492,20 +492,21 @@ if __name__ == "__main__":
     print(f"AI增强记忆游戏成功: {enhanced_memory_path}")
 
 # AI增强功能
-def generate_game_with_ai(self, topic: str, game_type: str = "quiz", output_filename: str = None):
+def generate_game_with_ai(self, topic: str, game_type: str = "quiz", requirements: str = None, output_filename: str = None):
     """
     使用AI生成完整游戏
     
     Args:
         topic: 游戏主题
         game_type: 游戏类型，支持 quiz（问答游戏）、memory（记忆游戏）、matching（匹配游戏）
+        requirements: 自定义要求
         output_filename: 输出文件名
         
     Returns:
         str: 生成的游戏文件路径
     """
     # 使用AI生成游戏内容
-    content = self._generate_game_content_with_ai(topic, game_type)
+    content = self._generate_game_content_with_ai(topic, game_type, requirements)
     # 生成游戏
     return self.generate_game(topic, content, game_type, output_filename)
 
@@ -527,13 +528,14 @@ def enhance_game_content_with_ai(self, topic: str, content: list, game_type: str
     # 生成游戏
     return self.generate_game(topic, enhanced_content, game_type, output_filename)
 
-def _generate_game_content_with_ai(self, topic: str, game_type: str):
+def _generate_game_content_with_ai(self, topic: str, game_type: str, requirements: str = None):
     """
     使用AI生成游戏内容
     
     Args:
         topic: 游戏主题
         game_type: 游戏类型
+        requirements: 自定义要求
         
     Returns:
         list: 游戏内容
@@ -578,6 +580,9 @@ def _generate_game_content_with_ai(self, topic: str, game_type: str):
         prompt += "  ...\n"
         prompt += "]\n"
         prompt += "请确保问题具有教育意义，选项合理，且正确答案明确。"
+
+    if requirements:
+        prompt += f"\n用户特殊要求：{requirements}"
 
     try:
         response = self.llm_client.generate(prompt)

@@ -46,6 +46,7 @@ class GenerateCoursewareRequest(BaseModel):
 class GeneratePPTWithAIRequest(BaseModel):
     """使用AI生成PPT请求"""
     topic: str = Field(..., description="PPT主题")
+    requirements: Optional[str] = Field(None, description="自定义要求")
     output_filename: Optional[str] = Field(None, description="输出文件名")
 
 class EnhancePPTWithAIRequest(BaseModel):
@@ -57,6 +58,7 @@ class EnhancePPTWithAIRequest(BaseModel):
 class GenerateLessonPlanWithAIRequest(BaseModel):
     """使用AI生成教案请求"""
     topic: str = Field(..., description="教案主题")
+    requirements: Optional[str] = Field(None, description="自定义要求")
     output_filename: Optional[str] = Field(None, description="输出文件名")
 
 class GenerateLessonPlanFromPPTWithAIRequest(BaseModel):
@@ -69,6 +71,7 @@ class GenerateGameWithAIRequest(BaseModel):
     """使用AI生成游戏请求"""
     topic: str = Field(..., description="游戏主题")
     game_type: str = Field("quiz", description="游戏类型 (quiz, memory, matching)")
+    requirements: Optional[str] = Field(None, description="自定义要求")
     output_filename: Optional[str] = Field(None, description="输出文件名")
 
 class EnhanceGameWithAIRequest(BaseModel):

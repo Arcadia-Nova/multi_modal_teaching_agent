@@ -204,12 +204,13 @@ class GenerationService:
                 "data": None
             }
     
-    def generate_ppt_with_ai(self, topic: str, output_filename: str = None):
+    def generate_ppt_with_ai(self, topic: str, requirements: str = None, output_filename: str = None):
         """
         使用AI生成PPT
         
         Args:
             topic: PPT主题
+            requirements: 自定义要求
             output_filename: 输出文件名
             
         Returns:
@@ -217,7 +218,7 @@ class GenerationService:
         """
         try:
             # 调用AI增强的PPT生成器
-            output_path = self.ppt_generator.generate_ppt_with_ai(topic, output_filename)
+            output_path = self.ppt_generator.generate_ppt_with_ai(topic, requirements, output_filename)
             
             # 生成可访问的URL
             relative_path = output_path.replace('app\\static\\', '')
@@ -273,12 +274,13 @@ class GenerationService:
                 "data": None
             }
     
-    def generate_lesson_plan_with_ai(self, topic: str, output_filename: str = None):
+    def generate_lesson_plan_with_ai(self, topic: str, requirements: str = None, output_filename: str = None):
         """
         使用AI生成教案
         
         Args:
             topic: 教案主题
+            requirements: 自定义要求
             output_filename: 输出文件名
             
         Returns:
@@ -286,7 +288,7 @@ class GenerationService:
         """
         try:
             # 调用AI增强的Word生成器
-            output_path = self.word_generator.generate_lesson_plan_with_ai(topic, output_filename)
+            output_path = self.word_generator.generate_lesson_plan_with_ai(topic, requirements, output_filename)
             
             # 生成可访问的URL
             relative_path = output_path.replace('app\\static\\', '')
@@ -342,13 +344,14 @@ class GenerationService:
                 "data": None
             }
     
-    def generate_game_with_ai(self, topic: str, game_type: str = "quiz", output_filename: str = None):
+    def generate_game_with_ai(self, topic: str, game_type: str = "quiz", requirements: str = None, output_filename: str = None):
         """
         使用AI生成游戏
         
         Args:
             topic: 游戏主题
             game_type: 游戏类型 (quiz, memory, matching)
+            requirements: 自定义要求
             output_filename: 输出文件名
             
         Returns:
@@ -356,7 +359,7 @@ class GenerationService:
         """
         try:
             # 调用AI增强的游戏生成器
-            output_path = self.game_generator.generate_game_with_ai(topic, game_type, output_filename)
+            output_path = self.game_generator.generate_game_with_ai(topic, game_type, requirements, output_filename)
             
             # 生成可访问的URL
             relative_path = output_path.replace('app\\static\\', '')
