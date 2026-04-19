@@ -71,7 +71,7 @@ class MessageService:
         self.db.query(Message).filter(Message.session_id == session_id).delete()
         self.db.commit()
 
-    def get_references(self,session_id: str, limit: int = 5) -> List[Dict[str, str]]:
+    def get_references(self,session_id: str, limit: int = 10) -> List[Dict[str, str]]:
         query = self.db.query(UploadedFile).filter(
             UploadedFile.session_id == session_id
         ).order_by(UploadedFile.created_at.desc())
