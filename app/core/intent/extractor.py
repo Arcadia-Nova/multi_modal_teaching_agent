@@ -29,13 +29,14 @@ class IntentExtractor:
 - difficult_points: 重难点列表
 - duration_minutes: 课堂时长（整数，单位分钟）
 - teaching_style: 教学风格（“讲授式”、“探究式”、“案例式”之一）
-- target_audience: 目标学段（“初中”、“高中”、“大学”）
+- target_audience: 目标学段（“小学”、“初中”、“高中”、“大学”）
 - special_requirements: 特殊要求列表（如“需要互动游戏”、“多举例”）
 
 注意：
 1. 只输出 JSON，不要有其他解释。
 2. 如果对话中教师未明确说明，可以结合上下文合理推断，但不要编造。
 3. 如果信息明显缺失，将对应字段设为 null。
+4. 如果教师未要求课堂时长则默认为40分钟
 """
         user_prompt = f"对话历史：\n{self._format_history(conversation_history)}\n请提取教学意图："
 
