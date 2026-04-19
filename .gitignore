@@ -5,3 +5,7 @@ __pycache__/
 
 # 忽略 JetBrains IDE 配置目录
 .idea/
+
+app/static
+
+uploads

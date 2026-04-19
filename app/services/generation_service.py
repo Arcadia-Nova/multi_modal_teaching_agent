@@ -41,8 +41,31 @@ class GenerationService:
                 raise ValueError("请提供内容或大纲")
             
             # 生成可访问的URL
-            relative_path = output_path.replace('app\\static\\', '')
-            access_url = f"/static/{relative_path}"
+            import os
+            from app.config import settings
+            
+            # 确保output_path是绝对路径
+            if not os.path.isabs(output_path):
+                output_path = os.path.abspath(output_path)
+            
+            # 确保settings.EXPORT_DIR是绝对路径
+            if not os.path.isabs(settings.EXPORT_DIR):
+                export_dir_abs = os.path.abspath(settings.EXPORT_DIR)
+            else:
+                export_dir_abs = settings.EXPORT_DIR
+            
+            # 计算相对路径（从static目录开始）
+            if output_path.startswith(export_dir_abs):
+                # 从export_dir中提取相对路径
+                relative_path = output_path[len(export_dir_abs):].lstrip(os.sep)
+                # 确保使用正斜杠
+                relative_path = relative_path.replace('\\', '/')
+                access_url = f"/static/exports/{relative_path}"
+            else:
+                # 回退到原来的方法
+                relative_path = output_path.replace('app\\static\\', '')
+                relative_path = relative_path.replace('\\', '/')
+                access_url = f"/static/{relative_path}"
             
             return {
                 "success": True,
@@ -124,8 +147,31 @@ class GenerationService:
             output_path = self.word_generator.generate_word(topic, content, output_filename)
             
             # 生成可访问的URL
-            relative_path = output_path.replace('app\\static\\', '')
-            access_url = f"/static/{relative_path}"
+            import os
+            from app.config import settings
+            
+            # 确保output_path是绝对路径
+            if not os.path.isabs(output_path):
+                output_path = os.path.abspath(output_path)
+            
+            # 确保settings.EXPORT_DIR是绝对路径
+            if not os.path.isabs(settings.EXPORT_DIR):
+                export_dir_abs = os.path.abspath(settings.EXPORT_DIR)
+            else:
+                export_dir_abs = settings.EXPORT_DIR
+            
+            # 计算相对路径（从static目录开始）
+            if output_path.startswith(export_dir_abs):
+                # 从export_dir中提取相对路径
+                relative_path = output_path[len(export_dir_abs):].lstrip(os.sep)
+                # 确保使用正斜杠
+                relative_path = relative_path.replace('\\', '/')
+                access_url = f"/static/exports/{relative_path}"
+            else:
+                # 回退到原来的方法
+                relative_path = output_path.replace('app\\static\\', '')
+                relative_path = relative_path.replace('\\', '/')
+                access_url = f"/static/{relative_path}"
             
             return {
                 "success": True,
@@ -186,8 +232,31 @@ class GenerationService:
             output_path = self.game_generator.generate_game(topic, content, game_type, output_filename)
             
             # 生成可访问的URL
-            relative_path = output_path.replace('app\\static\\', '')
-            access_url = f"/static/{relative_path}"
+            import os
+            from app.config import settings
+            
+            # 确保output_path是绝对路径
+            if not os.path.isabs(output_path):
+                output_path = os.path.abspath(output_path)
+            
+            # 确保settings.EXPORT_DIR是绝对路径
+            if not os.path.isabs(settings.EXPORT_DIR):
+                export_dir_abs = os.path.abspath(settings.EXPORT_DIR)
+            else:
+                export_dir_abs = settings.EXPORT_DIR
+            
+            # 计算相对路径（从static目录开始）
+            if output_path.startswith(export_dir_abs):
+                # 从export_dir中提取相对路径
+                relative_path = output_path[len(export_dir_abs):].lstrip(os.sep)
+                # 确保使用正斜杠
+                relative_path = relative_path.replace('\\', '/')
+                access_url = f"/static/exports/{relative_path}"
+            else:
+                # 回退到原来的方法
+                relative_path = output_path.replace('app\\static\\', '')
+                relative_path = relative_path.replace('\\', '/')
+                access_url = f"/static/{relative_path}"
             
             return {
                 "success": True,
@@ -221,8 +290,31 @@ class GenerationService:
             output_path = self.ppt_generator.generate_ppt_with_ai(topic, requirements, output_filename)
             
             # 生成可访问的URL
-            relative_path = output_path.replace('app\\static\\', '')
-            access_url = f"/static/{relative_path}"
+            import os
+            from app.config import settings
+            
+            # 确保output_path是绝对路径
+            if not os.path.isabs(output_path):
+                output_path = os.path.abspath(output_path)
+            
+            # 确保settings.EXPORT_DIR是绝对路径
+            if not os.path.isabs(settings.EXPORT_DIR):
+                export_dir_abs = os.path.abspath(settings.EXPORT_DIR)
+            else:
+                export_dir_abs = settings.EXPORT_DIR
+            
+            # 计算相对路径（从static目录开始）
+            if output_path.startswith(export_dir_abs):
+                # 从export_dir中提取相对路径
+                relative_path = output_path[len(export_dir_abs):].lstrip(os.sep)
+                # 确保使用正斜杠
+                relative_path = relative_path.replace('\\', '/')
+                access_url = f"/static/exports/{relative_path}"
+            else:
+                # 回退到原来的方法
+                relative_path = output_path.replace('app\\static\\', '')
+                relative_path = relative_path.replace('\\', '/')
+                access_url = f"/static/{relative_path}"
             
             return {
                 "success": True,
@@ -256,8 +348,31 @@ class GenerationService:
             output_path = self.ppt_generator.enhance_ppt_content_with_ai(topic, content, output_filename)
             
             # 生成可访问的URL
-            relative_path = output_path.replace('app\\static\\', '')
-            access_url = f"/static/{relative_path}"
+            import os
+            from app.config import settings
+            
+            # 确保output_path是绝对路径
+            if not os.path.isabs(output_path):
+                output_path = os.path.abspath(output_path)
+            
+            # 确保settings.EXPORT_DIR是绝对路径
+            if not os.path.isabs(settings.EXPORT_DIR):
+                export_dir_abs = os.path.abspath(settings.EXPORT_DIR)
+            else:
+                export_dir_abs = settings.EXPORT_DIR
+            
+            # 计算相对路径（从static目录开始）
+            if output_path.startswith(export_dir_abs):
+                # 从export_dir中提取相对路径
+                relative_path = output_path[len(export_dir_abs):].lstrip(os.sep)
+                # 确保使用正斜杠
+                relative_path = relative_path.replace('\\', '/')
+                access_url = f"/static/exports/{relative_path}"
+            else:
+                # 回退到原来的方法
+                relative_path = output_path.replace('app\\static\\', '')
+                relative_path = relative_path.replace('\\', '/')
+                access_url = f"/static/{relative_path}"
             
             return {
                 "success": True,
@@ -291,8 +406,31 @@ class GenerationService:
             output_path = self.word_generator.generate_lesson_plan_with_ai(topic, requirements, output_filename)
             
             # 生成可访问的URL
-            relative_path = output_path.replace('app\\static\\', '')
-            access_url = f"/static/{relative_path}"
+            import os
+            from app.config import settings
+            
+            # 确保output_path是绝对路径
+            if not os.path.isabs(output_path):
+                output_path = os.path.abspath(output_path)
+            
+            # 确保settings.EXPORT_DIR是绝对路径
+            if not os.path.isabs(settings.EXPORT_DIR):
+                export_dir_abs = os.path.abspath(settings.EXPORT_DIR)
+            else:
+                export_dir_abs = settings.EXPORT_DIR
+            
+            # 计算相对路径（从static目录开始）
+            if output_path.startswith(export_dir_abs):
+                # 从export_dir中提取相对路径
+                relative_path = output_path[len(export_dir_abs):].lstrip(os.sep)
+                # 确保使用正斜杠
+                relative_path = relative_path.replace('\\', '/')
+                access_url = f"/static/exports/{relative_path}"
+            else:
+                # 回退到原来的方法
+                relative_path = output_path.replace('app\\static\\', '')
+                relative_path = relative_path.replace('\\', '/')
+                access_url = f"/static/{relative_path}"
             
             return {
                 "success": True,
@@ -326,8 +464,31 @@ class GenerationService:
             output_path = self.word_generator.generate_lesson_plan_from_ppt(topic, ppt_content, output_filename)
             
             # 生成可访问的URL
-            relative_path = output_path.replace('app\\static\\', '')
-            access_url = f"/static/{relative_path}"
+            import os
+            from app.config import settings
+            
+            # 确保output_path是绝对路径
+            if not os.path.isabs(output_path):
+                output_path = os.path.abspath(output_path)
+            
+            # 确保settings.EXPORT_DIR是绝对路径
+            if not os.path.isabs(settings.EXPORT_DIR):
+                export_dir_abs = os.path.abspath(settings.EXPORT_DIR)
+            else:
+                export_dir_abs = settings.EXPORT_DIR
+            
+            # 计算相对路径（从static目录开始）
+            if output_path.startswith(export_dir_abs):
+                # 从export_dir中提取相对路径
+                relative_path = output_path[len(export_dir_abs):].lstrip(os.sep)
+                # 确保使用正斜杠
+                relative_path = relative_path.replace('\\', '/')
+                access_url = f"/static/exports/{relative_path}"
+            else:
+                # 回退到原来的方法
+                relative_path = output_path.replace('app\\static\\', '')
+                relative_path = relative_path.replace('\\', '/')
+                access_url = f"/static/{relative_path}"
             
             return {
                 "success": True,
@@ -362,8 +523,31 @@ class GenerationService:
             output_path = self.game_generator.generate_game_with_ai(topic, game_type, requirements, output_filename)
             
             # 生成可访问的URL
-            relative_path = output_path.replace('app\\static\\', '')
-            access_url = f"/static/{relative_path}"
+            import os
+            from app.config import settings
+            
+            # 确保output_path是绝对路径
+            if not os.path.isabs(output_path):
+                output_path = os.path.abspath(output_path)
+            
+            # 确保settings.EXPORT_DIR是绝对路径
+            if not os.path.isabs(settings.EXPORT_DIR):
+                export_dir_abs = os.path.abspath(settings.EXPORT_DIR)
+            else:
+                export_dir_abs = settings.EXPORT_DIR
+            
+            # 计算相对路径（从static目录开始）
+            if output_path.startswith(export_dir_abs):
+                # 从export_dir中提取相对路径
+                relative_path = output_path[len(export_dir_abs):].lstrip(os.sep)
+                # 确保使用正斜杠
+                relative_path = relative_path.replace('\\', '/')
+                access_url = f"/static/exports/{relative_path}"
+            else:
+                # 回退到原来的方法
+                relative_path = output_path.replace('app\\static\\', '')
+                relative_path = relative_path.replace('\\', '/')
+                access_url = f"/static/{relative_path}"
             
             return {
                 "success": True,
@@ -398,8 +582,31 @@ class GenerationService:
             output_path = self.game_generator.enhance_game_content_with_ai(topic, content, game_type, output_filename)
             
             # 生成可访问的URL
-            relative_path = output_path.replace('app\\static\\', '')
-            access_url = f"/static/{relative_path}"
+            import os
+            from app.config import settings
+            
+            # 确保output_path是绝对路径
+            if not os.path.isabs(output_path):
+                output_path = os.path.abspath(output_path)
+            
+            # 确保settings.EXPORT_DIR是绝对路径
+            if not os.path.isabs(settings.EXPORT_DIR):
+                export_dir_abs = os.path.abspath(settings.EXPORT_DIR)
+            else:
+                export_dir_abs = settings.EXPORT_DIR
+            
+            # 计算相对路径（从static目录开始）
+            if output_path.startswith(export_dir_abs):
+                # 从export_dir中提取相对路径
+                relative_path = output_path[len(export_dir_abs):].lstrip(os.sep)
+                # 确保使用正斜杠
+                relative_path = relative_path.replace('\\', '/')
+                access_url = f"/static/exports/{relative_path}"
+            else:
+                # 回退到原来的方法
+                relative_path = output_path.replace('app\\static\\', '')
+                relative_path = relative_path.replace('\\', '/')
+                access_url = f"/static/{relative_path}"
             
             return {
                 "success": True,

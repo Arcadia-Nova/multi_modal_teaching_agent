@@ -30,7 +30,7 @@ class DialogueService:
         session = self.sessions[session_id]
 
         # 添加用户消息到历史
-        self.message_service.save_message(session_id, "user", user_message)
+        # self.message_service.save_message(session_id, "user", user_message)
 
         history = self.message_service.get_history(session_id)
 
@@ -39,21 +39,21 @@ class DialogueService:
         session["intent"] = updated_intent
 
         # 判断是否完整
-        if updated_intent.is_complete:
+        # if updated_intent.is_complete:
             # 生成确认信息
-            summary = self.clarifier.generate_summary(updated_intent)
-            self._save_intent(session_id, updated_intent)
-            reply = f"已理解您的教学需求：\n{summary}\n\n如果确认无误，请回复“确认生成”开始制作课件；如需修改，请直接告诉我。"
-        else:
-            # 生成追问
-            questions = self.clarifier.generate_questions(updated_intent)
-            if questions:
-                reply = questions[0]  # 一次问一个
-            else:
-                reply = "请提供更多教学信息（如学科、主题、知识点等）。"
+        summary = self.clarifier.generate_summary(updated_intent)
+        self._save_intent(session_id, updated_intent)
+        reply = f"已理解您的教学需求：\n{summary}\n\n如果确认无误，请回复“确认生成”开始制作课件；如需修改，请直接告诉我。"
+        # else:
+        #     # 生成追问
+        #     questions = self.clarifier.generate_questions(updated_intent)
+        #     if questions:
+        #         reply = questions[0]  # 一次问一个
+        #     else:
+        #         reply = "请提供更多教学信息（如学科、主题、知识点等）。"
 
         # 添加助手回复到历史
-        self.message_service.save_message(session_id, "assistant", reply)
+        # self.message_service.save_message(session_id, "assistant", reply)
         return reply
 
     def confirm_and_get_intent(self, session_id: str) -> TeachingIntent:

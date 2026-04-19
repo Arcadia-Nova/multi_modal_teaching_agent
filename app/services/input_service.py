@@ -30,15 +30,15 @@ class InputService:
         # 2. 转文字
         text = await self.transcriber.transcribe(audio_path)
 
-        # 3. 保存消息到数据库
-        message = Message(
-            session_id=session_id,
-            role="user",
-            content=text,
-            raw_audio_path=audio_path
-        )
-        self.db.add(message)
-        self.db.commit()
+        # # 3. 保存消息到数据库
+        # message = Message(
+        #     session_id=session_id,
+        #     role="user",
+        #     content=text,
+        #     raw_audio_path=audio_path
+        # )
+        # self.db.add(message)
+        # self.db.commit()
 
         return text
 
