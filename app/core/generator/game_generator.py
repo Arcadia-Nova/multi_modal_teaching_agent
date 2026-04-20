@@ -434,6 +434,266 @@ class GameGenerator:
 
         return ''.join(html_parts)
 
+    # AI增强功能
+    def generate_game_with_ai(self, topic: str, game_type: str = "quiz", requirements: str = None,
+                              output_filename: str = None):
+        """
+        使用AI生成完整游戏
+
+        Args:
+            topic: 游戏主题
+            game_type: 游戏类型，支持 quiz（问答游戏）、memory（记忆游戏）、matching（匹配游戏）
+            requirements: 自定义要求
+            output_filename: 输出文件名
+
+        Returns:
+            str: 生成的游戏文件路径
+        """
+        # 使用AI生成游戏内容
+        content = self._generate_game_content_with_ai(topic, game_type, requirements)
+        # 生成游戏
+        return self.generate_game(topic, content, game_type, output_filename)
+
+    def enhance_game_content_with_ai(self, topic: str, content: list, game_type: str = "quiz",
+                                     output_filename: str = None):
+        """
+        使用AI增强游戏内容
+
+        Args:
+            topic: 游戏主题
+            content: 游戏内容
+            game_type: 游戏类型
+            output_filename: 输出文件名
+
+        Returns:
+            str: 生成的游戏文件路径
+        """
+        # 使用AI增强游戏内容
+        enhanced_content = self._enhance_game_content_with_ai(topic, content, game_type)
+        # 生成游戏
+        return self.generate_game(topic, enhanced_content, game_type, output_filename)
+
+    def _generate_game_content_with_ai(self, topic: str, game_type: str, requirements: str = None):
+        """
+        使用AI生成游戏内容
+
+        Args:
+            topic: 游戏主题
+            game_type: 游戏类型
+            requirements: 自定义要求
+
+        Returns:
+            list: 游戏内容
+        """
+        if game_type == "quiz":
+            prompt = f"请为'{topic}'主题生成5个问答游戏题目，每个题目包含一个问题、4个选项和1个正确答案的索引（从0开始）。\n"
+            prompt += "请以以下格式输出：\n"
+            prompt += "[\n"
+            prompt += "  {\n"
+            prompt += "    \"title\": \"问题内容\",\n"
+            prompt += "    \"content\": [\"选项1\", \"选项2\", \"选项3\", \"选项4\"],\n"
+            prompt += "    \"correct\": 正确答案的索引（0-3）\n"
+            prompt += "  },\n"
+            prompt += "  ...\n"
+            prompt += "]\n"
+            prompt += "请确保问题具有教育意义，选项合理，且正确答案明确。"
+        elif game_type == "memory":
+            prompt = f"请为'{topic}'主题生成10个适合记忆游戏的词汇或短语。\n"
+            prompt += "请以列表形式输出，每个词汇或短语占一行。\n"
+            prompt += "请确保这些词汇或短语与主题相关，且易于记忆。"
+        elif game_type == "matching":
+            prompt = f"请为'{topic}'主题生成5对匹配项，每对包含一个概念和对应的解释或相关内容。\n"
+            prompt += "请以以下格式输出：\n"
+            prompt += "[\n"
+            prompt += "  {\n"
+            prompt += "    \"title\": \"概念\",\n"
+            prompt += "    \"content\": [\"相关内容1\", \"相关内容2\"]\n"
+            prompt += "  },\n"
+            prompt += "  ...\n"
+            prompt += "]\n"
+            prompt += "请确保概念与相关内容之间有明确的对应关系。"
+        else:
+            # 默认生成问答游戏内容
+            prompt = f"请为'{topic}'主题生成5个问答游戏题目，每个题目包含一个问题、4个选项和1个正确答案的索引（从0开始）。\n"
+            prompt += "请以以下格式输出：\n"
+            prompt += "[\n"
+            prompt += "  {\n"
+            prompt += "    \"title\": \"问题内容\",\n"
+            prompt += "    \"content\": [\"选项1\", \"选项2\", \"选项3\", \"选项4\"],\n"
+            prompt += "    \"correct\": 正确答案的索引（0-3）\n"
+            prompt += "  },\n"
+            prompt += "  ...\n"
+            prompt += "]\n"
+            prompt += "请确保问题具有教育意义，选项合理，且正确答案明确。"
+
+        if requirements:
+            prompt += f"\n用户特殊要求：{requirements}"
+
+        try:
+            response = self.llm_client.generate(prompt)
+            # 尝试解析响应
+            import json
+            try:
+                # 去除可能的markdown代码块标记
+                if response.startswith("```json"):
+                    response = response[7:]
+                if response.endswith("```"):
+                    response = response[:-3]
+                content = json.loads(response.strip())
+                return content
+            except json.JSONDecodeError:
+                # 如果是记忆游戏，尝试解析为列表
+                if game_type == "memory":
+                    content = [line.strip() for line in response.split('\n') if line.strip()]
+                    return content
+                # 解析失败，返回默认内容
+                print("解析AI生成的游戏内容失败，使用默认内容")
+                return self._get_default_game_content(topic, game_type)
+        except Exception as e:
+            print(f"生成游戏内容失败: {str(e)}")
+            # 失败时返回默认内容
+            return self._get_default_game_content(topic, game_type)
+
+    def _enhance_game_content_with_ai(self, topic: str, content: list, game_type: str):
+        """
+        使用AI增强游戏内容
+
+        Args:
+            topic: 游戏主题
+            content: 游戏内容
+            game_type: 游戏类型
+
+        Returns:
+            list: 增强后的游戏内容
+        """
+        if game_type == "quiz":
+            # 增强问答游戏内容
+            enhanced_content = []
+            for item in content:
+                if isinstance(item, dict) and 'title' in item and 'content' in item:
+                    prompt = f"请增强以下问答游戏题目，使其更具教育意义和挑战性：\n"
+                    prompt += f"问题：{item['title']}\n"
+                    prompt += f"选项：{', '.join(item['content'])}\n"
+                    prompt += "请保持问题的核心内容，同时增加一些细节或背景信息，使问题更加丰富。\n"
+                    prompt += "请以以下格式输出：\n"
+                    prompt += "{\n"
+                    prompt += "  \"title\": \"增强后的问题\",\n"
+                    prompt += "  \"content\": [\"选项1\", \"选项2\", \"选项3\", \"选项4\"]\n"
+                    prompt += "}\n"
+
+                    try:
+                        response = self.llm_client.generate(prompt)
+                        import json
+                        enhanced_item = json.loads(response.strip())
+                        enhanced_content.append(enhanced_item)
+                    except Exception as e:
+                        print(f"增强问答题目失败: {str(e)}")
+                        enhanced_content.append(item)
+                else:
+                    enhanced_content.append(item)
+            return enhanced_content
+        elif game_type == "memory":
+            # 增强记忆游戏内容
+            prompt = f"请为'{topic}'主题增强以下记忆游戏内容，使其更加丰富和有教育意义：\n"
+            prompt += f"当前内容：{', '.join(content)}\n"
+            prompt += "请生成更多与主题相关的词汇或短语，确保它们易于记忆且具有教育价值。\n"
+            prompt += "请以列表形式输出，每个词汇或短语占一行。"
+
+            try:
+                response = self.llm_client.generate(prompt)
+                enhanced_content = [line.strip() for line in response.split('\n') if line.strip()]
+                return enhanced_content if enhanced_content else content
+            except Exception as e:
+                print(f"增强记忆游戏内容失败: {str(e)}")
+                return content
+        elif game_type == "matching":
+            # 增强匹配游戏内容
+            enhanced_content = []
+            for item in content:
+                if isinstance(item, dict) and 'title' in item and 'content' in item:
+                    prompt = f"请增强以下匹配游戏内容，使其更加丰富和有教育意义：\n"
+                    prompt += f"概念：{item['title']}\n"
+                    prompt += f"相关内容：{', '.join(item['content'])}\n"
+                    prompt += "请为该概念添加更多相关内容，确保它们与概念有明确的对应关系。\n"
+                    prompt += "请以以下格式输出：\n"
+                    prompt += "{\n"
+                    prompt += "  \"title\": \"概念\",\n"
+                    prompt += "  \"content\": [\"相关内容1\", \"相关内容2\", ...]\n"
+                    prompt += "}\n"
+
+                    try:
+                        response = self.llm_client.generate(prompt)
+                        import json
+                        enhanced_item = json.loads(response.strip())
+                        enhanced_content.append(enhanced_item)
+                    except Exception as e:
+                        print(f"增强匹配游戏内容失败: {str(e)}")
+                        enhanced_content.append(item)
+                else:
+                    enhanced_content.append(item)
+            return enhanced_content
+        else:
+            return content
+
+    def _get_default_game_content(self, topic: str, game_type: str):
+        """
+        获取默认游戏内容
+
+        Args:
+            topic: 游戏主题
+            game_type: 游戏类型
+
+        Returns:
+            list: 默认游戏内容
+        """
+        if game_type == "quiz":
+            return [
+                {
+                    'title': f'{topic}的基本概念是什么?',
+                    'content': ['选项1', '选项2', '选项3', '选项4'],
+                    'correct': 0
+                },
+                {
+                    'title': f'{topic}的重要性体现在哪些方面?',
+                    'content': ['选项1', '选项2', '选项3', '选项4'],
+                    'correct': 0
+                },
+                {
+                    'title': f'{topic}的应用场景有哪些?',
+                    'content': ['选项1', '选项2', '选项3', '选项4'],
+                    'correct': 0
+                },
+                {
+                    'title': f'{topic}的发展历史是怎样的?',
+                    'content': ['选项1', '选项2', '选项3', '选项4'],
+                    'correct': 0
+                },
+                {
+                    'title': f'{topic}的未来趋势是什么?',
+                    'content': ['选项1', '选项2', '选项3', '选项4'],
+                    'correct': 0
+                }
+            ]
+        elif game_type == "memory":
+            return [f'{topic}概念1', f'{topic}概念2', f'{topic}概念3', f'{topic}概念4', f'{topic}概念5']
+        elif game_type == "matching":
+            return [
+                {
+                    'title': f'{topic}概念1',
+                    'content': ['相关内容1', '相关内容2']
+                },
+                {
+                    'title': f'{topic}概念2',
+                    'content': ['相关内容1', '相关内容2']
+                },
+                {
+                    'title': f'{topic}概念3',
+                    'content': ['相关内容1', '相关内容2']
+                }
+            ]
+        else:
+            return []
+
 # 测试代码
 if __name__ == "__main__":
     generator = GameGenerator()
@@ -491,267 +751,3 @@ if __name__ == "__main__":
     enhanced_memory_path = generator.enhance_game_content_with_ai("AI术语", ["机器学习", "深度学习", "神经网络"], game_type="memory")
     print(f"AI增强记忆游戏成功: {enhanced_memory_path}")
 
-# AI增强功能
-def generate_game_with_ai(self, topic: str, game_type: str = "quiz", requirements: str = None, output_filename: str = None):
-    """
-    使用AI生成完整游戏
-    
-    Args:
-        topic: 游戏主题
-        game_type: 游戏类型，支持 quiz（问答游戏）、memory（记忆游戏）、matching（匹配游戏）
-        requirements: 自定义要求
-        output_filename: 输出文件名
-        
-    Returns:
-        str: 生成的游戏文件路径
-    """
-    # 使用AI生成游戏内容
-    content = self._generate_game_content_with_ai(topic, game_type, requirements)
-    # 生成游戏
-    return self.generate_game(topic, content, game_type, output_filename)
-
-def enhance_game_content_with_ai(self, topic: str, content: list, game_type: str = "quiz", output_filename: str = None):
-    """
-    使用AI增强游戏内容
-    
-    Args:
-        topic: 游戏主题
-        content: 游戏内容
-        game_type: 游戏类型
-        output_filename: 输出文件名
-        
-    Returns:
-        str: 生成的游戏文件路径
-    """
-    # 使用AI增强游戏内容
-    enhanced_content = self._enhance_game_content_with_ai(topic, content, game_type)
-    # 生成游戏
-    return self.generate_game(topic, enhanced_content, game_type, output_filename)
-
-def _generate_game_content_with_ai(self, topic: str, game_type: str, requirements: str = None):
-    """
-    使用AI生成游戏内容
-    
-    Args:
-        topic: 游戏主题
-        game_type: 游戏类型
-        requirements: 自定义要求
-        
-    Returns:
-        list: 游戏内容
-    """
-    if game_type == "quiz":
-        prompt = f"请为'{topic}'主题生成5个问答游戏题目，每个题目包含一个问题、4个选项和1个正确答案的索引（从0开始）。\n"
-        prompt += "请以以下格式输出：\n"
-        prompt += "[\n"
-        prompt += "  {\n"
-        prompt += "    \"title\": \"问题内容\",\n"
-        prompt += "    \"content\": [\"选项1\", \"选项2\", \"选项3\", \"选项4\"],\n"
-        prompt += "    \"correct\": 正确答案的索引（0-3）\n"
-        prompt += "  },\n"
-        prompt += "  ...\n"
-        prompt += "]\n"
-        prompt += "请确保问题具有教育意义，选项合理，且正确答案明确。"
-    elif game_type == "memory":
-        prompt = f"请为'{topic}'主题生成10个适合记忆游戏的词汇或短语。\n"
-        prompt += "请以列表形式输出，每个词汇或短语占一行。\n"
-        prompt += "请确保这些词汇或短语与主题相关，且易于记忆。"
-    elif game_type == "matching":
-        prompt = f"请为'{topic}'主题生成5对匹配项，每对包含一个概念和对应的解释或相关内容。\n"
-        prompt += "请以以下格式输出：\n"
-        prompt += "[\n"
-        prompt += "  {\n"
-        prompt += "    \"title\": \"概念\",\n"
-        prompt += "    \"content\": [\"相关内容1\", \"相关内容2\"]\n"
-        prompt += "  },\n"
-        prompt += "  ...\n"
-        prompt += "]\n"
-        prompt += "请确保概念与相关内容之间有明确的对应关系。"
-    else:
-        # 默认生成问答游戏内容
-        prompt = f"请为'{topic}'主题生成5个问答游戏题目，每个题目包含一个问题、4个选项和1个正确答案的索引（从0开始）。\n"
-        prompt += "请以以下格式输出：\n"
-        prompt += "[\n"
-        prompt += "  {\n"
-        prompt += "    \"title\": \"问题内容\",\n"
-        prompt += "    \"content\": [\"选项1\", \"选项2\", \"选项3\", \"选项4\"],\n"
-        prompt += "    \"correct\": 正确答案的索引（0-3）\n"
-        prompt += "  },\n"
-        prompt += "  ...\n"
-        prompt += "]\n"
-        prompt += "请确保问题具有教育意义，选项合理，且正确答案明确。"
-
-    if requirements:
-        prompt += f"\n用户特殊要求：{requirements}"
-
-    try:
-        response = self.llm_client.generate(prompt)
-        # 尝试解析响应
-        import json
-        try:
-            # 去除可能的markdown代码块标记
-            if response.startswith("```json"):
-                response = response[7:]
-            if response.endswith("```"):
-                response = response[:-3]
-            content = json.loads(response.strip())
-            return content
-        except json.JSONDecodeError:
-            # 如果是记忆游戏，尝试解析为列表
-            if game_type == "memory":
-                content = [line.strip() for line in response.split('\n') if line.strip()]
-                return content
-            # 解析失败，返回默认内容
-            print("解析AI生成的游戏内容失败，使用默认内容")
-            return self._get_default_game_content(topic, game_type)
-    except Exception as e:
-        print(f"生成游戏内容失败: {str(e)}")
-        # 失败时返回默认内容
-        return self._get_default_game_content(topic, game_type)
-
-def _enhance_game_content_with_ai(self, topic: str, content: list, game_type: str):
-    """
-    使用AI增强游戏内容
-    
-    Args:
-        topic: 游戏主题
-        content: 游戏内容
-        game_type: 游戏类型
-        
-    Returns:
-        list: 增强后的游戏内容
-    """
-    if game_type == "quiz":
-        # 增强问答游戏内容
-        enhanced_content = []
-        for item in content:
-            if isinstance(item, dict) and 'title' in item and 'content' in item:
-                prompt = f"请增强以下问答游戏题目，使其更具教育意义和挑战性：\n"
-                prompt += f"问题：{item['title']}\n"
-                prompt += f"选项：{', '.join(item['content'])}\n"
-                prompt += "请保持问题的核心内容，同时增加一些细节或背景信息，使问题更加丰富。\n"
-                prompt += "请以以下格式输出：\n"
-                prompt += "{\n"
-                prompt += "  \"title\": \"增强后的问题\",\n"
-                prompt += "  \"content\": [\"选项1\", \"选项2\", \"选项3\", \"选项4\"]\n"
-                prompt += "}\n"
-                
-                try:
-                    response = self.llm_client.generate(prompt)
-                    import json
-                    enhanced_item = json.loads(response.strip())
-                    enhanced_content.append(enhanced_item)
-                except Exception as e:
-                    print(f"增强问答题目失败: {str(e)}")
-                    enhanced_content.append(item)
-            else:
-                enhanced_content.append(item)
-        return enhanced_content
-    elif game_type == "memory":
-        # 增强记忆游戏内容
-        prompt = f"请为'{topic}'主题增强以下记忆游戏内容，使其更加丰富和有教育意义：\n"
-        prompt += f"当前内容：{', '.join(content)}\n"
-        prompt += "请生成更多与主题相关的词汇或短语，确保它们易于记忆且具有教育价值。\n"
-        prompt += "请以列表形式输出，每个词汇或短语占一行。"
-        
-        try:
-            response = self.llm_client.generate(prompt)
-            enhanced_content = [line.strip() for line in response.split('\n') if line.strip()]
-            return enhanced_content if enhanced_content else content
-        except Exception as e:
-            print(f"增强记忆游戏内容失败: {str(e)}")
-            return content
-    elif game_type == "matching":
-        # 增强匹配游戏内容
-        enhanced_content = []
-        for item in content:
-            if isinstance(item, dict) and 'title' in item and 'content' in item:
-                prompt = f"请增强以下匹配游戏内容，使其更加丰富和有教育意义：\n"
-                prompt += f"概念：{item['title']}\n"
-                prompt += f"相关内容：{', '.join(item['content'])}\n"
-                prompt += "请为该概念添加更多相关内容，确保它们与概念有明确的对应关系。\n"
-                prompt += "请以以下格式输出：\n"
-                prompt += "{\n"
-                prompt += "  \"title\": \"概念\",\n"
-                prompt += "  \"content\": [\"相关内容1\", \"相关内容2\", ...]\n"
-                prompt += "}\n"
-                
-                try:
-                    response = self.llm_client.generate(prompt)
-                    import json
-                    enhanced_item = json.loads(response.strip())
-                    enhanced_content.append(enhanced_item)
-                except Exception as e:
-                    print(f"增强匹配游戏内容失败: {str(e)}")
-                    enhanced_content.append(item)
-            else:
-                enhanced_content.append(item)
-        return enhanced_content
-    else:
-        return content
-
-def _get_default_game_content(self, topic: str, game_type: str):
-    """
-    获取默认游戏内容
-    
-    Args:
-        topic: 游戏主题
-        game_type: 游戏类型
-        
-    Returns:
-        list: 默认游戏内容
-    """
-    if game_type == "quiz":
-        return [
-            {
-                'title': f'{topic}的基本概念是什么?',
-                'content': ['选项1', '选项2', '选项3', '选项4'],
-                'correct': 0
-            },
-            {
-                'title': f'{topic}的重要性体现在哪些方面?',
-                'content': ['选项1', '选项2', '选项3', '选项4'],
-                'correct': 0
-            },
-            {
-                'title': f'{topic}的应用场景有哪些?',
-                'content': ['选项1', '选项2', '选项3', '选项4'],
-                'correct': 0
-            },
-            {
-                'title': f'{topic}的发展历史是怎样的?',
-                'content': ['选项1', '选项2', '选项3', '选项4'],
-                'correct': 0
-            },
-            {
-                'title': f'{topic}的未来趋势是什么?',
-                'content': ['选项1', '选项2', '选项3', '选项4'],
-                'correct': 0
-            }
-        ]
-    elif game_type == "memory":
-        return [f'{topic}概念1', f'{topic}概念2', f'{topic}概念3', f'{topic}概念4', f'{topic}概念5']
-    elif game_type == "matching":
-        return [
-            {
-                'title': f'{topic}概念1',
-                'content': ['相关内容1', '相关内容2']
-            },
-            {
-                'title': f'{topic}概念2',
-                'content': ['相关内容1', '相关内容2']
-            },
-            {
-                'title': f'{topic}概念3',
-                'content': ['相关内容1', '相关内容2']
-            }
-        ]
-    else:
-        return []
-
-# 将AI增强方法添加到GameGenerator类
-GameGenerator.generate_game_with_ai = generate_game_with_ai
-GameGenerator.enhance_game_content_with_ai = enhance_game_content_with_ai
-GameGenerator._generate_game_content_with_ai = _generate_game_content_with_ai
-GameGenerator._enhance_game_content_with_ai = _enhance_game_content_with_ai
-GameGenerator._get_default_game_content = _get_default_game_content

@@ -213,4 +213,4 @@ def build_knowledge_base_full(collection_name: str = "teaching_knowledge_base"):
 
 if __name__ == "__main__":
     # 默认使用增量构建，也可改为全量构建
-    build_knowledge_base_full()
+    build_knowledge_base_incremental()

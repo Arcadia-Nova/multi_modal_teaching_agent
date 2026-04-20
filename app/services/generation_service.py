@@ -1,8 +1,12 @@
+from locale import resetlocale
+from re import search
+
 from app.core.generator.ppt_generator import PPTGenerator
 from app.core.generator.word_generator import WordGenerator
 from app.core.generator.animation_generator import AnimationGenerator
 from app.core.generator.game_generator import GameGenerator
 from app.core.generator.llm_client import LLMClient
+from app.core.rag.retriever import Retriever
 import json
 
 class GenerationService:
@@ -13,6 +17,7 @@ class GenerationService:
         self.animation_generator = AnimationGenerator()
         self.game_generator = GameGenerator()
         self.llm_client = LLMClient()
+        self.retriever = Retriever()
     
     def generate_ppt(self, topic: str, content: list = None, outline: dict = None, output_filename: str = None):
         """
@@ -99,7 +104,13 @@ class GenerationService:
         Returns:
             dict: PPT大纲
         """
-        prompt = f"请为'{topic}'主题生成一个PPT大纲，包含以下结构：\n"
+
+        text = f"主题: {topic}"+"附带本地向量库查询结果供参考："
+        search_result=self.retriever.retrieve(topic,top_k=3)
+        for r in search_result:
+            text+=r["content"]
+
+        prompt = f"请为'{text}'中的主题生成一个PPT大纲，如果附带的本地向量库查询结果与生成内容有关联可适当参考，PPT大纲包含以下结构：\n"
         prompt += "{\n"
         prompt += "  \"topic\": \"主题名称\",\n"
         prompt += "  \"sections\": [\n"
