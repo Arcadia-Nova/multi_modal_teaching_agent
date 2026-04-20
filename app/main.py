@@ -58,7 +58,9 @@ app.add_middleware(
 # ---  挂载静态文件目录 ---
 # 用于让前端直接访问生成的 PPT/Word 文件（预览或下载用）
 # 访问路径示例: http://127.0.0.1:8000/static/exports/test.pptx
-app.mount("/static", StaticFiles(directory=settings.EXPORT_DIR), name="static")
+from pathlib import Path
+static_dir = Path(__file__).parent / "static"
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 
 # ---  注册全局异常处理器 ---

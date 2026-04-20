@@ -94,5 +94,7 @@ settings.KNOWLEDGE_BASE_DIR = str(KNOWLEDGE_BASE_DIR)
 settings.VECTOR_STORE_PATH = str(VECTOR_STORE_PATH)
 if not os.path.isabs(settings.UPLOAD_DIR):
     settings.UPLOAD_DIR = str(BASE_DIR / settings.UPLOAD_DIR)
+if not os.path.isabs(settings.EXPORT_DIR):
+    settings.EXPORT_DIR = str(BASE_DIR / settings.EXPORT_DIR)
 if not os.path.isabs(settings.DATABASE_PATH):
     settings.DATABASE_PATH = str(BASE_DIR / settings.DATABASE_PATH)

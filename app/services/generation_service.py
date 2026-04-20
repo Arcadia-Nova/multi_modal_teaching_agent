@@ -60,12 +60,19 @@ class GenerationService:
                 relative_path = output_path[len(export_dir_abs):].lstrip(os.sep)
                 # 确保使用正斜杠
                 relative_path = relative_path.replace('\\', '/')
+                # 构建正确的静态文件URL
                 access_url = f"/static/exports/{relative_path}"
             else:
-                # 回退到原来的方法
-                relative_path = output_path.replace('app\\static\\', '')
-                relative_path = relative_path.replace('\\', '/')
-                access_url = f"/static/{relative_path}"
+                # 回退到基于static目录的路径
+                static_dir = os.path.join(os.path.dirname(os.path.dirname(output_path)), 'static')
+                if output_path.startswith(static_dir):
+                    relative_path = output_path[len(static_dir):].lstrip(os.sep)
+                    relative_path = relative_path.replace('\\', '/')
+                    access_url = f"/static/{relative_path}"
+                else:
+                    # 最后的回退方法
+                    filename = os.path.basename(output_path)
+                    access_url = f"/static/exports/{filename}"
             
             return {
                 "success": True,
@@ -166,12 +173,19 @@ class GenerationService:
                 relative_path = output_path[len(export_dir_abs):].lstrip(os.sep)
                 # 确保使用正斜杠
                 relative_path = relative_path.replace('\\', '/')
+                # 构建正确的静态文件URL
                 access_url = f"/static/exports/{relative_path}"
             else:
-                # 回退到原来的方法
-                relative_path = output_path.replace('app\\static\\', '')
-                relative_path = relative_path.replace('\\', '/')
-                access_url = f"/static/{relative_path}"
+                # 回退到基于static目录的路径
+                static_dir = os.path.join(os.path.dirname(os.path.dirname(output_path)), 'static')
+                if output_path.startswith(static_dir):
+                    relative_path = output_path[len(static_dir):].lstrip(os.sep)
+                    relative_path = relative_path.replace('\\', '/')
+                    access_url = f"/static/{relative_path}"
+                else:
+                    # 最后的回退方法
+                    filename = os.path.basename(output_path)
+                    access_url = f"/static/exports/{filename}"
             
             return {
                 "success": True,
@@ -251,12 +265,19 @@ class GenerationService:
                 relative_path = output_path[len(export_dir_abs):].lstrip(os.sep)
                 # 确保使用正斜杠
                 relative_path = relative_path.replace('\\', '/')
+                # 构建正确的静态文件URL
                 access_url = f"/static/exports/{relative_path}"
             else:
-                # 回退到原来的方法
-                relative_path = output_path.replace('app\\static\\', '')
-                relative_path = relative_path.replace('\\', '/')
-                access_url = f"/static/{relative_path}"
+                # 回退到基于static目录的路径
+                static_dir = os.path.join(os.path.dirname(os.path.dirname(output_path)), 'static')
+                if output_path.startswith(static_dir):
+                    relative_path = output_path[len(static_dir):].lstrip(os.sep)
+                    relative_path = relative_path.replace('\\', '/')
+                    access_url = f"/static/{relative_path}"
+                else:
+                    # 最后的回退方法
+                    filename = os.path.basename(output_path)
+                    access_url = f"/static/exports/{filename}"
             
             return {
                 "success": True,
@@ -309,12 +330,19 @@ class GenerationService:
                 relative_path = output_path[len(export_dir_abs):].lstrip(os.sep)
                 # 确保使用正斜杠
                 relative_path = relative_path.replace('\\', '/')
+                # 构建正确的静态文件URL
                 access_url = f"/static/exports/{relative_path}"
             else:
-                # 回退到原来的方法
-                relative_path = output_path.replace('app\\static\\', '')
-                relative_path = relative_path.replace('\\', '/')
-                access_url = f"/static/{relative_path}"
+                # 回退到基于static目录的路径
+                static_dir = os.path.join(os.path.dirname(os.path.dirname(output_path)), 'static')
+                if output_path.startswith(static_dir):
+                    relative_path = output_path[len(static_dir):].lstrip(os.sep)
+                    relative_path = relative_path.replace('\\', '/')
+                    access_url = f"/static/{relative_path}"
+                else:
+                    # 最后的回退方法
+                    filename = os.path.basename(output_path)
+                    access_url = f"/static/exports/{filename}"
             
             return {
                 "success": True,
@@ -367,12 +395,19 @@ class GenerationService:
                 relative_path = output_path[len(export_dir_abs):].lstrip(os.sep)
                 # 确保使用正斜杠
                 relative_path = relative_path.replace('\\', '/')
+                # 构建正确的静态文件URL
                 access_url = f"/static/exports/{relative_path}"
             else:
-                # 回退到原来的方法
-                relative_path = output_path.replace('app\\static\\', '')
-                relative_path = relative_path.replace('\\', '/')
-                access_url = f"/static/{relative_path}"
+                # 回退到基于static目录的路径
+                static_dir = os.path.join(os.path.dirname(os.path.dirname(output_path)), 'static')
+                if output_path.startswith(static_dir):
+                    relative_path = output_path[len(static_dir):].lstrip(os.sep)
+                    relative_path = relative_path.replace('\\', '/')
+                    access_url = f"/static/{relative_path}"
+                else:
+                    # 最后的回退方法
+                    filename = os.path.basename(output_path)
+                    access_url = f"/static/exports/{filename}"
             
             return {
                 "success": True,
@@ -425,12 +460,19 @@ class GenerationService:
                 relative_path = output_path[len(export_dir_abs):].lstrip(os.sep)
                 # 确保使用正斜杠
                 relative_path = relative_path.replace('\\', '/')
+                # 构建正确的静态文件URL
                 access_url = f"/static/exports/{relative_path}"
             else:
-                # 回退到原来的方法
-                relative_path = output_path.replace('app\\static\\', '')
-                relative_path = relative_path.replace('\\', '/')
-                access_url = f"/static/{relative_path}"
+                # 回退到基于static目录的路径
+                static_dir = os.path.join(os.path.dirname(os.path.dirname(output_path)), 'static')
+                if output_path.startswith(static_dir):
+                    relative_path = output_path[len(static_dir):].lstrip(os.sep)
+                    relative_path = relative_path.replace('\\', '/')
+                    access_url = f"/static/{relative_path}"
+                else:
+                    # 最后的回退方法
+                    filename = os.path.basename(output_path)
+                    access_url = f"/static/exports/{filename}"
             
             return {
                 "success": True,
@@ -483,12 +525,19 @@ class GenerationService:
                 relative_path = output_path[len(export_dir_abs):].lstrip(os.sep)
                 # 确保使用正斜杠
                 relative_path = relative_path.replace('\\', '/')
+                # 构建正确的静态文件URL
                 access_url = f"/static/exports/{relative_path}"
             else:
-                # 回退到原来的方法
-                relative_path = output_path.replace('app\\static\\', '')
-                relative_path = relative_path.replace('\\', '/')
-                access_url = f"/static/{relative_path}"
+                # 回退到基于static目录的路径
+                static_dir = os.path.join(os.path.dirname(os.path.dirname(output_path)), 'static')
+                if output_path.startswith(static_dir):
+                    relative_path = output_path[len(static_dir):].lstrip(os.sep)
+                    relative_path = relative_path.replace('\\', '/')
+                    access_url = f"/static/{relative_path}"
+                else:
+                    # 最后的回退方法
+                    filename = os.path.basename(output_path)
+                    access_url = f"/static/exports/{filename}"
             
             return {
                 "success": True,
@@ -542,12 +591,19 @@ class GenerationService:
                 relative_path = output_path[len(export_dir_abs):].lstrip(os.sep)
                 # 确保使用正斜杠
                 relative_path = relative_path.replace('\\', '/')
+                # 构建正确的静态文件URL
                 access_url = f"/static/exports/{relative_path}"
             else:
-                # 回退到原来的方法
-                relative_path = output_path.replace('app\\static\\', '')
-                relative_path = relative_path.replace('\\', '/')
-                access_url = f"/static/{relative_path}"
+                # 回退到基于static目录的路径
+                static_dir = os.path.join(os.path.dirname(os.path.dirname(output_path)), 'static')
+                if output_path.startswith(static_dir):
+                    relative_path = output_path[len(static_dir):].lstrip(os.sep)
+                    relative_path = relative_path.replace('\\', '/')
+                    access_url = f"/static/{relative_path}"
+                else:
+                    # 最后的回退方法
+                    filename = os.path.basename(output_path)
+                    access_url = f"/static/exports/{filename}"
             
             return {
                 "success": True,
@@ -601,12 +657,19 @@ class GenerationService:
                 relative_path = output_path[len(export_dir_abs):].lstrip(os.sep)
                 # 确保使用正斜杠
                 relative_path = relative_path.replace('\\', '/')
+                # 构建正确的静态文件URL
                 access_url = f"/static/exports/{relative_path}"
             else:
-                # 回退到原来的方法
-                relative_path = output_path.replace('app\\static\\', '')
-                relative_path = relative_path.replace('\\', '/')
-                access_url = f"/static/{relative_path}"
+                # 回退到基于static目录的路径
+                static_dir = os.path.join(os.path.dirname(os.path.dirname(output_path)), 'static')
+                if output_path.startswith(static_dir):
+                    relative_path = output_path[len(static_dir):].lstrip(os.sep)
+                    relative_path = relative_path.replace('\\', '/')
+                    access_url = f"/static/{relative_path}"
+                else:
+                    # 最后的回退方法
+                    filename = os.path.basename(output_path)
+                    access_url = f"/static/exports/{filename}"
             
             return {
                 "success": True,
